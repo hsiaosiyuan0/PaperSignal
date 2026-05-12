@@ -1,0 +1,395 @@
+{
+  "voice": "en-US-AvaMultilingualNeural",
+  "sentences": [
+    {
+      "index": 0,
+      "text": "LLMs are wide but shallow: trained on general-domain web text, they collapse when you push them into a professional context — medicine, law, finance, code — where the cost of being wrong is high and the rules are local and precise.",
+      "hash": "6db5e72998409ebe",
+      "filename": "s0001.mp3"
+    },
+    {
+      "index": 1,
+      "text": "The survey is direct about why this matters in three dimensions: pretrained knowledge is broad but shallow, reasoning with domain-specific constraints needs multi-step logical consistency, and context sensitivity trips LLMs up whenever the same term means different things in different settings.",
+      "hash": "46881aba769e0214",
+      "filename": "s0003.mp3"
+    },
+    {
+      "index": 2,
+      "text": "Two earlier strategies don't solve it cleanly.",
+      "hash": "8810b4dddcd3d911",
+      "filename": "s0005.mp3"
+    },
+    {
+      "index": 3,
+      "text": "Fine-tuning on domain data risks catastrophic forgetting and adding hallucinations when new knowledge conflicts with pre-training (a Google Research result the authors cite).",
+      "hash": "f76b062f07f0e070",
+      "filename": "s0007.mp3"
+    },
+    {
+      "index": 4,
+      "text": "Traditional Retrieval-Augmented Generation — flat text chunks, vector retrieval — leaves four limitations in place:",
+      "hash": "e1b5e345aca1f056",
+      "filename": "s0009.mp3"
+    },
+    {
+      "index": 5,
+      "text": "Complex query understanding: keyword/vector similarity on chunks misses multi-hop reasoning.",
+      "hash": "61fd3332bcb42f0b",
+      "filename": "s0011.mp3"
+    },
+    {
+      "index": 6,
+      "text": "Asked about a relation between A and D, vanilla RAG retrieves A and D directly and misses the bridging B and C.",
+      "hash": "f2f2c2670ff832f9",
+      "filename": "s0013.mp3"
+    },
+    {
+      "index": 7,
+      "text": "Distributed domain knowledge: chunking sacrifices contextual integrity; the hierarchical relationships between concepts vanish.",
+      "hash": "e4de257c7b008e48",
+      "filename": "s0015.mp3"
+    },
+    {
+      "index": 8,
+      "text": "LLM constraints: vector retrieval over-returns; the LLM's fixed context window (2K-32K tokens) can't hold it all, so critical info gets truncated.",
+      "hash": "d37d3a21663dd5e5",
+      "filename": "s0017.mp3"
+    },
+    {
+      "index": 9,
+      "text": "Efficiency & scalability: searching unstructured text gets slower as the KB grows.",
+      "hash": "b34ff740e139975f",
+      "filename": "s0019.mp3"
+    },
+    {
+      "index": 10,
+      "text": "The survey's claim is that structuring knowledge as a graph addresses all four — and that the resulting paradigm, GraphRAG, has matured into a recognizable family of techniques worth a proper taxonomy.",
+      "hash": "95c7e9e892eee55b",
+      "filename": "s0021.mp3"
+    },
+    {
+      "index": 11,
+      "text": "The survey's main contribution is the taxonomy.",
+      "hash": "af4f3c13d161b1ea",
+      "filename": "s0023.mp3"
+    },
+    {
+      "index": 12,
+      "text": "Existing GraphRAG systems fall into three paradigms based on what the graph is for:",
+      "hash": "93b73425cdf0a315",
+      "filename": "s0025.mp3"
+    },
+    {
+      "index": 13,
+      "text": "❶ Knowledge-based GraphRAG — graphs as knowledge carriers.",
+      "hash": "bcc01716d2603cc0",
+      "filename": "s0027.mp3"
+    },
+    {
+      "index": 14,
+      "text": "Either construct a KG from a corpus via Open Information Extraction (GraphRAG by Microsoft, GraphReader, QUEST, AutoKG), or plug into an existing KG (DBpedia, YAGO; or domain-specific: SPOKE for biomedical, AceKG for academic, Lynx for legal).",
+      "hash": "8bddf4eb4ae67f8e",
+      "filename": "s0029.mp3"
+    },
+    {
+      "index": 15,
+      "text": "Retrieval here is reasoning-path traversal: ToG uses beam search over relation triples; RoG and KGR use LLMs as planning agents; KnowGPT formulates path exploration as a reinforcement learning problem.",
+      "hash": "54093eb714a16c8c",
+      "filename": "s0031.mp3"
+    },
+    {
+      "index": 16,
+      "text": "❷ Index-based GraphRAG — graphs as indexing tools over raw text chunks.",
+      "hash": "bc6718aad79c1b68",
+      "filename": "s0033.mp3"
+    },
+    {
+      "index": 17,
+      "text": "Each node is a text chunk; edges encode semantic similarity or shared entities.",
+      "hash": "85943ff38c3ff34b",
+      "filename": "s0035.mp3"
+    },
+    {
+      "index": 18,
+      "text": "Retrieval is a graph traversal that decides which chunks to surface.",
+      "hash": "8bec50af1346a895",
+      "filename": "s0037.mp3"
+    },
+    {
+      "index": 19,
+      "text": "GNN-ret, PG-RAG, KGP work this way.",
+      "hash": "f0313100d166b2c3",
+      "filename": "s0039.mp3"
+    },
+    {
+      "index": 20,
+      "text": "The graph adds context-preserving lookup; the actual factual content still lives in the underlying text.",
+      "hash": "58aabb3ddc402ae0",
+      "filename": "s0041.mp3"
+    },
+    {
+      "index": 21,
+      "text": "❸ Hybrid GraphRAG — both, e.g., GraphRAG (the Microsoft system), MedGraphRAG, GoR.",
+      "hash": "542e16067263053f",
+      "filename": "s0043.mp3"
+    },
+    {
+      "index": 22,
+      "text": "The graph carries summarized knowledge and indexes the original text chunks so the LLM can fall back to fine-grained context when needed.",
+      "hash": "931fb7c58114e6b0",
+      "filename": "s0045.mp3"
+    },
+    {
+      "index": 23,
+      "text": "Each paradigm has its workflow broken into three stages: knowledge organization → retrieval → integration.",
+      "hash": "aefb97256e93ae03",
+      "filename": "s0047.mp3"
+    },
+    {
+      "index": 24,
+      "text": "The retrieval stage gets the heaviest treatment because it's where the design choices stack up.",
+      "hash": "138d9faf2005726b",
+      "filename": "s0049.mp3"
+    },
+    {
+      "index": 25,
+      "text": "The survey tabulates representative systems along two axes:",
+      "hash": "cb95358b9389b191",
+      "filename": "s0051.mp3"
+    },
+    {
+      "index": 26,
+      "text": "Retrieval techniques: similarity-based (BERT/SentenceBERT embeddings + cosine, TF-IDF, PCST pruning), logical-based (relation path generation, rule mining, MCTS planning), GNN-based (RGNN for query expansion, GAT for graph features), LLM-based (LLM as agent over the graph: community summaries, beam search over relations, keyword search), RL-based (KnowGPT, Spider use deep RL to learn retrieval policies).",
+      "hash": "0fab1ffc2b0f5bfa",
+      "filename": "s0053.mp3"
+    },
+    {
+      "index": 27,
+      "text": "Strategies: multi-round (DialogGSR, Graph-CoT, GoR iteratively expand the retrieved subgraph), post-retrieval (CoK, KGR run verification or claim-checking on retrieved facts), hybrid retrieval (StructRAG routes between five candidate structure types per query; ToG-2 alternates KG traversal with document retrieval).",
+      "hash": "d58f1f0fa3a7c514",
+      "filename": "s0055.mp3"
+    },
+    {
+      "index": 28,
+      "text": "Knowledge integration — how to feed the retrieved subgraph into the LLM prompt — gets its own section: structural prompt formats, graph-token verbalization, training adapters that consume graph embeddings directly.",
+      "hash": "54598bfdd17467bd",
+      "filename": "s0057.mp3"
+    },
+    {
+      "index": 29,
+      "text": "Less mature as a research area than retrieval, per the authors' own framing.",
+      "hash": "4a8e4a735de8103e",
+      "filename": "s0059.mp3"
+    },
+    {
+      "index": 30,
+      "text": "The survey's table identifies four wins:",
+      "hash": "49697762f27ca5af",
+      "filename": "s0061.mp3"
+    },
+    {
+      "index": 31,
+      "text": "Dimension",
+      "hash": "45e147abd920eeb1",
+      "filename": "s0063.mp3"
+    },
+    {
+      "index": 32,
+      "text": "Traditional RAG",
+      "hash": "915dd768d836f14e",
+      "filename": "s0065.mp3"
+    },
+    {
+      "index": 33,
+      "text": "GraphRAG",
+      "hash": "0f8c3038521a6278",
+      "filename": "s0067.mp3"
+    },
+    {
+      "index": 34,
+      "text": "Knowledge representation",
+      "hash": "5ffba003aae042d6",
+      "filename": "s0069.mp3"
+    },
+    {
+      "index": 35,
+      "text": "Flat chunks; semantic relations implicit",
+      "hash": "820f1f09691bbfa4",
+      "filename": "s0071.mp3"
+    },
+    {
+      "index": 36,
+      "text": "Explicit relations, hierarchies, multi-hop paths",
+      "hash": "d7228e92685a1455",
+      "filename": "s0073.mp3"
+    },
+    {
+      "index": 37,
+      "text": "Flexibility",
+      "hash": "1ef8e6da45d2dd08",
+      "filename": "s0075.mp3"
+    },
+    {
+      "index": 38,
+      "text": "Text-centric",
+      "hash": "3c132e4ae5236a77",
+      "filename": "s0077.mp3"
+    },
+    {
+      "index": 39,
+      "text": "Structured + semi-structured + unstructured in one graph",
+      "hash": "cf9e34a02ddd91db",
+      "filename": "s0079.mp3"
+    },
+    {
+      "index": 40,
+      "text": "Efficiency",
+      "hash": "12c4ffe1d987164a",
+      "filename": "s0081.mp3"
+    },
+    {
+      "index": 41,
+      "text": "Slow at scale; chunk re-indexing on updates",
+      "hash": "2efe6c48ae8c332c",
+      "filename": "s0083.mp3"
+    },
+    {
+      "index": 42,
+      "text": "Graph DBs optimized for relation queries; 26-97% fewer tokens in published comparisons; nodes can be added without re-indexing",
+      "hash": "95c96d5ecf041bea",
+      "filename": "s0085.mp3"
+    },
+    {
+      "index": 43,
+      "text": "Interpretability",
+      "hash": "590c56fffde928ae",
+      "filename": "s0087.mp3"
+    },
+    {
+      "index": 45,
+      "text": "Traceable reasoning paths through the graph",
+      "hash": "c5a12bbf2ae376d6",
+      "filename": "s0091.mp3"
+    },
+    {
+      "index": 46,
+      "text": "The 26-97% token reduction is the most-cited operational win in the literature they survey — comes from the LLM consuming a focused subgraph instead of a pile of text chunks.",
+      "hash": "3ee420e6e4125032",
+      "filename": "s0093.mp3"
+    },
+    {
+      "index": 47,
+      "text": "A meaningful nuance: the authors distinguish their taxonomy from earlier GraphRAG surveys (which described workflow only) by carving out Hybrid as a first-class category.",
+      "hash": "e2b70759f0f67af5",
+      "filename": "s0095.mp3"
+    },
+    {
+      "index": 48,
+      "text": "The argument is that pure knowledge-based GraphRAG (relying on KG quality) and pure index-based GraphRAG (relying on retrieval over text) trade off against each other — the production systems converging in 2024-2025 (LightRAG, StructRAG, MedGraphRAG, the Microsoft GraphRAG) are all hybrid because neither pure approach is strong enough alone.",
+      "hash": "edb4fe35ab05b860",
+      "filename": "s0097.mp3"
+    },
+    {
+      "index": 49,
+      "text": "The survey is also unusual in being upfront about limitations:",
+      "hash": "a8f95612daaad49c",
+      "filename": "s0099.mp3"
+    },
+    {
+      "index": 50,
+      "text": "(i) high-quality KGs are scarce and constructing them from corpora is expensive;",
+      "hash": "ea6b881289491319",
+      "filename": "s0101.mp3"
+    },
+    {
+      "index": 51,
+      "text": "(ii) the granularity trade-off in extracted KGs — fine-grained means large graphs and high compute, coarse-grained means lossy summaries;",
+      "hash": "b526be4624dd5b13",
+      "filename": "s0103.mp3"
+    },
+    {
+      "index": 52,
+      "text": "(iii) LLM-summary-based KG construction (Microsoft's GraphRAG, for instance) has prohibitive token costs at scale.",
+      "hash": "bd8e7b2090ad1b83",
+      "filename": "s0105.mp3"
+    },
+    {
+      "index": 53,
+      "text": "This is the kind of survey worth keeping bookmarked.",
+      "hash": "f021d196aa2170d6",
+      "filename": "s0107.mp3"
+    },
+    {
+      "index": 54,
+      "text": "It does three things well:",
+      "hash": "d7f8538d7b8b4dac",
+      "filename": "s0109.mp3"
+    },
+    {
+      "index": 55,
+      "text": "Clear taxonomy (Knowledge-based / Index-based / Hybrid) that maps every system to a recognizable cell, with the workflow decomposition (organization / retrieval / integration) cutting orthogonally through it.",
+      "hash": "14ac3ba54b590d4b",
+      "filename": "s0111.mp3"
+    },
+    {
+      "index": 56,
+      "text": "Comprehensive Table I tabulating ~30 representative GraphRAG systems with their preprocessing models, matching algorithm, pruning method, and output type.",
+      "hash": "f044d11e087245ff",
+      "filename": "s0113.mp3"
+    },
+    {
+      "index": 57,
+      "text": "This is the artifact most researchers will actually use.",
+      "hash": "013d0370118cc083",
+      "filename": "s0115.mp3"
+    },
+    {
+      "index": 58,
+      "text": "An accompanying GitHub repo (DEEP-PolyU/Awesome-GraphRAG) collecting papers, open-source projects, and benchmark datasets — explicitly designed to outlive the survey.",
+      "hash": "9174b3dca6cd3f9c",
+      "filename": "s0117.mp3"
+    },
+    {
+      "index": 59,
+      "text": "What the survey deliberately doesn't do: provide a head-to-head benchmark comparison.",
+      "hash": "6c7203aecc3b6388",
+      "filename": "s0119.mp3"
+    },
+    {
+      "index": 60,
+      "text": "The authors note the lack of standardized benchmarks across GraphRAG implementations and treat that as an open problem rather than trying to crown a winner.",
+      "hash": "b1d91c30afa6d3e5",
+      "filename": "s0121.mp3"
+    },
+    {
+      "index": 61,
+      "text": "That's the honest call — GraphRAG benchmarks are not yet at the stability where you can confidently rank methods.",
+      "hash": "bda963590880cecd",
+      "filename": "s0123.mp3"
+    },
+    {
+      "index": 62,
+      "text": "Strategic takeaway for someone deploying GraphRAG in 2025-2026: the field has converged on Hybrid as the production pattern.",
+      "hash": "5a4666af64d999d3",
+      "filename": "s0125.mp3"
+    },
+    {
+      "index": 63,
+      "text": "Pure knowledge-based works well when you have a high-quality domain KG already (biomedical, legal); pure index-based works when raw text quality is high and the multi-hop demands are mild.",
+      "hash": "fefb2bae75c162a9",
+      "filename": "s0127.mp3"
+    },
+    {
+      "index": 64,
+      "text": "Hybrid is the safer default — you pay for the complexity but you stop being bottlenecked by either KG completeness or chunk-level retrieval recall.",
+      "hash": "71d2a5d472d09a39",
+      "filename": "s0129.mp3"
+    },
+    {
+      "index": 65,
+      "text": "The survey crystallizes this convergence, which is its main value to a practitioner.",
+      "hash": "13b27b678e653dbc",
+      "filename": "s0131.mp3"
+    }
+  ]
+}
