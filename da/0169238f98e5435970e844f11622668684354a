@@ -1,0 +1,23 @@
+src/paperread/report.py
+  s_f16df956489b28::t_d0547ac12815ad 309
+reports/1706.03762v7/audio/.manifest.json
+  s_f16df956489b28::t_146986c0cea64f 14,20,26,32,38,44,50,56,62,68,74,80,86,92,98,104,110
+reports/1706.03762v7/index.html
+  s_f16df956489b28::t_146986c0cea64f 24,345-347,349,351,353-354,357,360,363-365,370-373,378-381,384-387,390-393,397-398,400-402
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "da0169238f98e5435970e844f11622668684354a",
+  "prompts": {},
+  "sessions": {
+    "s_f16df956489b28": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7af84cbc-2d77-4f8d-abb6-02d07898a70e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "hsiaosiyuan0 <hsiaosiyuan0@outlook.com>"
+    }
+  }
+}
