@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attention Is All You Need — paperread</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,30..100;1,9..144,300..700,30..100&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<style>
+:root {
+  --bone: #F4EFE6;
+  --bone-soft: #FBF7EE;
+  --graphite: #1F1F1E;
+  --graphite-soft: #6A6A66;
+  --graphite-fade: #B7B5AE;
+  --vermillion: #C9482A;
+  --vermillion-soft: rgba(201, 72, 42, 0.08);
+  --hairline: rgba(31, 31, 30, 0.14);
+  --serif: "Fraunces", "Iowan Old Style", "Hoefler Text", Georgia, serif;
+  --serif-cn: "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", serif;
+  --mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+  --reading-width: 38rem;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--bone);
+  color: var(--graphite);
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 14, "SOFT" 50;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+article {
+  max-width: var(--reading-width);
+  margin: 0 auto;
+  padding: 4.5rem 1.5rem 2rem;
+  position: relative;
+}
+
+.lang-switch {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 0.25rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.lang-switch button {
+  border: 1px solid var(--hairline);
+  background: transparent;
+  color: var(--graphite-soft);
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+.lang-switch button:hover { color: var(--vermillion); }
+.lang-switch button.active {
+  background: var(--graphite);
+  color: var(--bone);
+  border-color: var(--graphite);
+}
+
+.brand {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--graphite-soft);
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+.brand .dot { color: var(--vermillion); }
+.brand-rule { border: none; border-top: 1px solid var(--hairline); margin: 0 0 3rem; }
+
+.meta {
+  display: flex;
+  gap: 1.5rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--graphite-soft);
+  margin-bottom: 2rem;
+}
+.meta .id {
+  color: var(--vermillion);
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+h1.title {
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 130, "SOFT" 35;
+  font-style: italic;
+  font-weight: 350;
+  font-size: clamp(2.1rem, 5vw, 3.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.018em;
+  margin: 0 0 1.75rem;
+  color: var(--graphite);
+  text-wrap: balance;
+}
+
+.authors {
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 14, "wght" 500;
+  font-size: 0.78rem;
+  font-feature-settings: "smcp" on, "c2sc" on;
+  letter-spacing: 0.08em;
+  color: var(--graphite-soft);
+  margin: 0 0 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--hairline);
+  text-wrap: pretty;
+}
+
+.body { counter-reset: section; }
+.body[data-lang="zh"] { font-family: var(--serif-cn); }
+.body[data-lang="zh"] h2, .body[data-lang="zh"] h3 { font-family: var(--serif-cn); }
+
+.body h1 { display: none; }
+
+.body h2 {
+  counter-increment: section;
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 36, "wght" 500;
+  font-size: 1.55rem;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 3.5rem 0 1.1rem;
+  color: var(--graphite);
+}
+.body h2::before {
+  content: counter(section, upper-roman);
+  display: inline;
+  color: var(--vermillion);
+  font-family: var(--mono);
+  font-size: 0.62em;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  margin-right: 0.85em;
+  vertical-align: 0.2em;
+}
+
+.body h3 {
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 24, "wght" 500;
+  font-style: italic;
+  font-size: 1.18rem;
+  margin: 2.5rem 0 0.9rem;
+}
+
+.body p {
+  margin: 0 0 1.1em;
+  font-variant-numeric: lining-nums proportional-nums;
+  text-wrap: pretty;
+  hanging-punctuation: first;
+}
+
+.body a {
+  color: var(--vermillion);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(201, 72, 42, 0.35);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.body a:hover { border-bottom-color: var(--vermillion); background: var(--vermillion-soft); }
+
+.body strong { font-weight: 600; }
+.body em { font-style: italic; }
+
+.body ul, .body ol { padding-left: 1.5rem; margin: 0 0 1.2em; }
+.body li { margin-bottom: 0.35em; }
+.body li::marker { color: var(--vermillion); font-family: var(--mono); }
+
+.body code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  padding: 0.1em 0.35em;
+  background: var(--vermillion-soft);
+  color: var(--graphite);
+  border-radius: 2px;
+}
+
+.body pre {
+  font-family: var(--mono);
+  font-size: 0.82em;
+  line-height: 1.6;
+  background: rgba(31, 31, 30, 0.04);
+  border-left: 2px solid var(--vermillion);
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1.6rem 0;
+}
+.body pre code { background: none; padding: 0; border-radius: 0; }
+
+.body blockquote {
+  font-style: italic;
+  font-variation-settings: "opsz" 18;
+  margin: 1.75rem 0;
+  padding: 0 1.25rem;
+  border-left: 2px solid var(--vermillion);
+  color: var(--graphite-soft);
+}
+
+.body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.75rem 0;
+  font-size: 0.92em;
+  font-variant-numeric: tabular-nums;
+}
+.body th, .body td {
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--hairline);
+}
+.body th:first-child, .body td:first-child { padding-left: 0; }
+.body th:last-child, .body td:last-child { padding-right: 0; }
+.body thead th {
+  border-bottom: 2px solid var(--graphite);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  font-family: var(--mono);
+}
+
+.body hr { border: none; border-top: 1px solid var(--hairline); margin: 2.5rem 0; }
+
+/* KaTeX */
+.body .katex-display {
+  margin: 1.75em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25em 0;
+}
+.body .katex { font-size: 1em; color: var(--graphite); }
+.body .katex-display > .katex { display: block; text-align: center; }
+
+/* Sentence audio */
+.body[data-lang="en"] .sentence {
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+  border-radius: 1px;
+  padding: 0 0.05em;
+}
+.body[data-lang="en"] .sentence.hover,
+.body[data-lang="en"] .sentence:hover {
+  background: var(--vermillion-soft);
+}
+.body[data-lang="en"] .sentence.playing {
+  background: var(--vermillion);
+  color: var(--bone);
+}
+
+footer {
+  max-width: var(--reading-width);
+  margin: 5rem auto 3rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--graphite-soft);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+footer a { color: var(--vermillion); text-decoration: none; }
+
+@media (max-width: 640px) {
+  article { padding: 3rem 1.25rem 1.5rem; }
+  .lang-switch { top: 1rem; right: 1rem; }
+  .brand { font-size: 0.62rem; gap: 1rem; }
+  .meta { gap: 0.9rem 1.2rem; font-size: 0.68rem; }
+  h1.title { font-size: 1.95rem; }
+  .authors { font-size: 0.72rem; }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bone: #1B1A18;
+    --bone-soft: #232220;
+    --graphite: #ECE5D6;
+    --graphite-soft: #948B7B;
+    --graphite-fade: #524C42;
+    --vermillion: #E36246;
+    --vermillion-soft: rgba(227, 98, 70, 0.10);
+    --hairline: rgba(236, 229, 214, 0.16);
+  }
+}
+
+@media print {
+  body { background: white; color: black; }
+  .lang-switch { display: none; }
+  article { padding: 1in 0.75in; }
+  .brand, footer { color: #555; }
+  .body[hidden] { display: none !important; }
+}
+</style>
+</head>
+<body>
+<article>
+  <div class="lang-switch" role="tablist" aria-label="Language"><button class="active" data-lang="en" aria-selected="true">EN</button><button data-lang="zh" aria-selected="false">中</button></div>
+  <div class="brand">
+    <span>Paperread</span>
+    <span class="dot">·</span>
+    <span>Research Brief</span>
+    <span class="dot">·</span>
+    <span>2026-05-12</span>
+  </div>
+  <hr class="brand-rule">
+  <div class="meta">
+    <span class="id">arXiv / 1706.03762v7</span>
+    <span>cs.CL</span>
+    <span>Published 2017-06-12</span>
+  </div>
+  <h1 class="title">Attention Is All You Need</h1>
+  <p class="authors">Ashish Vaswani · Noam Shazeer · Niki Parmar · Jakob Uszkoreit · Llion Jones · Aidan N. Gomez · Lukasz Kaiser · Illia Polosukhin</p>
+  <div class="body" data-lang="en">
+<h1>Attention Is All You Need — Research Brief</h1>
+<h2>Background</h2>
+<p><span class="sentence" data-audio="audio/s0001.mp3" data-sentence-id="0">The dominant approach to sequence transduction in 2017 — translation, summarization, speech recognition — relied on recurrent neural networks (LSTMs, GRUs) or convolutional architectures.</span> <span class="sentence" data-audio="audio/s0003.mp3" data-sentence-id="1">RNNs forced computation to be </span><strong><span class="sentence" data-audio="audio/s0003.mp3" data-sentence-id="1">sequential along the input</span></strong><span class="sentence" data-audio="audio/s0003.mp3" data-sentence-id="1">: hidden state $h_t$ depends on $h_{t-1}$, which is fundamentally at odds with modern hardware's parallelism.</span> <span class="sentence" data-audio="audio/s0005.mp3" data-sentence-id="2">This made long sequences slow to train and harder to scale.</span></p>
+<p><span class="sentence" data-audio="audio/s0005.mp3" data-sentence-id="2">Attention mechanisms had become a standard ingredient </span><em><span class="sentence" data-audio="audio/s0005.mp3" data-sentence-id="2">alongside</span></em><span class="sentence" data-audio="audio/s0005.mp3" data-sentence-id="2"> recurrence, used mainly to bridge long distances in the input.</span> <span class="sentence" data-audio="audio/s0007.mp3" data-sentence-id="3">But every model still kept the recurrent backbone, and so kept its bottleneck.</span></p>
+<p><span class="sentence" data-audio="audio/s0007.mp3" data-sentence-id="3">The paper's question is direct: </span><strong><span class="sentence" data-audio="audio/s0007.mp3" data-sentence-id="3">can we throw away the recurrence entirely and let attention carry the whole load?</span></strong></p>
+<h2>Approach</h2>
+<p><span class="sentence" data-audio="audio/s0009.mp3" data-sentence-id="4">The Transformer is built from three primitives, stacked into encoder–decoder layers:</span></p>
+<ol>
+<li><strong><span class="sentence" data-audio="audio/s0009.mp3" data-sentence-id="4">Scaled dot-product attention</span></strong><span class="sentence" data-audio="audio/s0009.mp3" data-sentence-id="4">.</span> <span class="sentence" data-audio="audio/s0011.mp3" data-sentence-id="5">Given queries $Q$, keys $K$, values $V$:</span></li>
+</ol>
+<p><span class="sentence" data-audio="audio/s0011.mp3" data-sentence-id="5">$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$</span></p>
+<p><span class="sentence" data-audio="audio/s0011.mp3" data-sentence-id="5">The scaling factor $1/\sqrt{d_k}$ keeps softmax gradients in a usable range as $d_k$ grows.</span></p>
+<ol start="2">
+<li>
+<p><strong><span class="sentence" data-audio="audio/s0013.mp3" data-sentence-id="6">Multi-head attention</span></strong><span class="sentence" data-audio="audio/s0013.mp3" data-sentence-id="6">.</span> <span class="sentence" data-audio="audio/s0015.mp3" data-sentence-id="7">Project $Q$, $K$, $V$ into $h$ different subspaces, run attention in each, concatenate the results.</span> <span class="sentence" data-audio="audio/s0017.mp3" data-sentence-id="8">This lets the model attend to different positions and different representational subspaces simultaneously, instead of averaging them into a single distribution.</span></p>
+</li>
+<li>
+<p><strong><span class="sentence" data-audio="audio/s0019.mp3" data-sentence-id="9">Positional encodings</span></strong><span class="sentence" data-audio="audio/s0019.mp3" data-sentence-id="9">.</span> <span class="sentence" data-audio="audio/s0021.mp3" data-sentence-id="10">Without recurrence, the model is permutation-equivariant.</span> <span class="sentence" data-audio="audio/s0023.mp3" data-sentence-id="11">The fix is a sinusoidal positional signal added to the input embedding:</span></p>
+</li>
+</ol>
+<p><span class="sentence" data-audio="audio/s0025.mp3" data-sentence-id="12">$$PE_{(pos, 2i)} = \sin(pos / 10000^{2i/d_{\text{model}}})$$</span></p>
+<p><span class="sentence" data-audio="audio/s0025.mp3" data-sentence-id="12">The choice of sinusoid (rather than learned) lets the model extrapolate to lengths longer than seen in training.</span></p>
+<p><span class="sentence" data-audio="audio/s0025.mp3" data-sentence-id="12">The encoder is six identical layers of [self-attention → feed-forward].</span> <span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">The decoder mirrors it with an added cross-attention sub-layer and masked self-attention so positions can't attend to the future.</span></p>
+<h2>Comparison</h2>
+<table>
+<thead>
+<tr>
+<th><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">Layer Type</span></th>
+<th><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">Complexity per layer</span></th>
+<th><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">Sequential ops</span></th>
+<th><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">Max path length</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">Recurrent</span></td>
+<td><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">$O(n \cdot d^2)$</span></td>
+<td><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">$O(n)$</span></td>
+<td><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">$O(n)$</span></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">Convolutional</span></td>
+<td><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">$O(k \cdot n \cdot d^2)$</span></td>
+<td><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">$O(1)$</span></td>
+<td><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">$O(\log_k n)$</span></td>
+</tr>
+<tr>
+<td><strong><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">Self-attention</span></strong></td>
+<td><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">$O(n^2 \cdot d)$</span></td>
+<td><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">$O(1)$</span></td>
+<td><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">$O(1)$</span></td>
+</tr>
+</tbody>
+</table>
+<p><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">The trade-off is explicit: self-attention pays $n^2$ in compute but collapses the maximum dependency path between any two positions to $O(1)$, while staying perfectly parallelizable.</span> <span class="sentence" data-audio="audio/s0029.mp3" data-sentence-id="14">For typical sentence lengths ($n &lt; d$), this is cheaper than RNN per layer too.</span></p>
+<p><span class="sentence" data-audio="audio/s0029.mp3" data-sentence-id="14">Against the best 2017 models on WMT 2014 EN→DE: Transformer (big) reaches </span><strong><span class="sentence" data-audio="audio/s0029.mp3" data-sentence-id="14">28.4 BLEU</span></strong><span class="sentence" data-audio="audio/s0029.mp3" data-sentence-id="14">, beating the previous best ensemble by ~2 BLEU, while training in 3.5 days on 8 P100s — a fraction of competitors' cost.</span></p>
+<h2>Summary</h2>
+<p><span class="sentence" data-audio="audio/s0029.mp3" data-sentence-id="14">The Transformer's importance was clear in retrospect but not obvious at the time: a clean architectural simplification that turned out to be the right substrate for everything downstream — BERT, GPT, ViT, CLIP, the entire modern foundation-model stack.</span> <span class="sentence" data-audio="audio/s0031.mp3" data-sentence-id="15">The mechanical contribution (scaled dot-product attention + multi-head + positional encoding) is small; the </span><strong><span class="sentence" data-audio="audio/s0031.mp3" data-sentence-id="15">conceptual move</span></strong><span class="sentence" data-audio="audio/s0031.mp3" data-sentence-id="15"> — refusing to keep recurrence as a comfort blanket — is what mattered.</span></p>
+<p><span class="sentence" data-audio="audio/s0031.mp3" data-sentence-id="15">What still surprises on re-reading: how </span><em><span class="sentence" data-audio="audio/s0031.mp3" data-sentence-id="15">little</span></em><span class="sentence" data-audio="audio/s0031.mp3" data-sentence-id="15"> tuning was needed.</span> <span class="sentence" data-audio="audio/s0033.mp3" data-sentence-id="16">Three primitives, a clean residual stack, layer normalization.</span> <span class="sentence" data-audio="audio/s0035.mp3" data-sentence-id="17">Most of the "tricks" are interpretability conveniences, not load-bearing.</span></p>
+<p><span class="sentence" data-audio="audio/s0035.mp3" data-sentence-id="17">Worth holding in mind: every modern attention variant (flash-attention, sliding window, MQA / GQA, rotary positional encoding) is a delta against this 2017 baseline.</span></p>
+
+  </div>
+  <div class="body" data-lang="zh" hidden>
+<h1>Attention Is All You Need — 研究简报</h1>
+<h2>背景</h2>
+<p>2017 年序列转换的主流方法 —— 翻译、摘要、语音识别 —— 依赖循环神经网络（LSTM、GRU）或卷积架构。RNN 强制计算<strong>沿输入序列串行</strong>：隐藏状态 $h_t$ 依赖 $h_{t-1}$，这与现代硬件的并行特性根本相悖，导致长序列训练慢、难以规模化。</p>
+<p>注意力机制早已成为标配，但通常<strong>和循环结构搭配使用</strong>，主要用来跨越输入中的长距离依赖。即便如此，所有模型都保留了循环骨架，瓶颈也就一并保留下来。</p>
+<p>这篇论文的问题直接而尖锐：<strong>能不能完全抛弃循环，让注意力独自挑大梁？</strong></p>
+<h2>核心方案</h2>
+<p>Transformer 由三个基本组件构成，堆叠成 encoder–decoder 层：</p>
+<ol>
+<li><strong>缩放点积注意力</strong>。给定查询 $Q$、键 $K$、值 $V$：</li>
+</ol>
+<p>$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$</p>
+<p>缩放因子 $1/\sqrt{d_k}$ 让 softmax 的梯度在 $d_k$ 增大时仍保持在可用范围内。</p>
+<ol start="2">
+<li>
+<p><strong>多头注意力</strong>。把 $Q$、$K$、$V$ 投影到 $h$ 个不同子空间，在每个子空间各跑一遍注意力，再把结果拼接起来。这让模型能<strong>同时关注</strong>不同位置、不同表示子空间，而非把它们平均成单一分布。</p>
+</li>
+<li>
+<p><strong>位置编码</strong>。没有循环，模型对位置就置换等价了。修法是在输入嵌入上加一组正弦位置信号：</p>
+</li>
+</ol>
+<p>$$PE_{(pos, 2i)} = \sin(pos / 10000^{2i/d_{\text{model}}})$$</p>
+<p>选择正弦（而非学习式）是为了让模型对训练时未见过的更长序列也能外推。</p>
+<p>encoder 是六层相同的 [self-attention → feed-forward]，decoder 镜像之，加一个 cross-attention 子层和带掩码的 self-attention，让位置无法关注未来。</p>
+<h2>与其他方案对比</h2>
+<table>
+<thead>
+<tr>
+<th>层类型</th>
+<th>单层复杂度</th>
+<th>串行操作</th>
+<th>最大路径长度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>循环</td>
+<td>$O(n \cdot d^2)$</td>
+<td>$O(n)$</td>
+<td>$O(n)$</td>
+</tr>
+<tr>
+<td>卷积</td>
+<td>$O(k \cdot n \cdot d^2)$</td>
+<td>$O(1)$</td>
+<td>$O(\log_k n)$</td>
+</tr>
+<tr>
+<td><strong>自注意力</strong></td>
+<td>$O(n^2 \cdot d)$</td>
+<td>$O(1)$</td>
+<td>$O(1)$</td>
+</tr>
+</tbody>
+</table>
+<p>权衡很明确：自注意力以 $n^2$ 计算量换来了任意两位置之间 $O(1)$ 的依赖路径长度，同时保持完美并行。在典型句长（$n &lt; d$）下，自注意力<strong>比 RNN 单层还便宜</strong>。</p>
+<p>在 WMT 2014 EN→DE 上对比 2017 年最佳模型：Transformer (big) 达 <strong>28.4 BLEU</strong>，比之前最佳的 ensemble 还高约 2 BLEU，训练只用了 8 块 P100 跑 3.5 天，远低于竞争对手的训练成本。</p>
+<h2>总结</h2>
+<p>Transformer 的重要性事后看清楚了，但当时未必显然：一个干净的架构简化，恰好成了下游所有东西的基底 —— BERT、GPT、ViT、CLIP，整个现代 foundation model 栈。机械层面的贡献（缩放点积注意力 + 多头 + 位置编码）其实不大；真正重要的是<strong>观念转变</strong> —— 拒绝把循环当作安全感的来源。</p>
+<p>重读时仍然觉得意外的是：<strong>调参之少</strong>。三个组件、一个干净的残差堆叠、layer normalization。多数所谓的&quot;技巧&quot;是为了可解释性方便，并非承重结构。</p>
+<p>值得记住一点：现代每一种 attention 变体（flash-attention、滑窗、MQA / GQA、旋转位置编码）都是相对于 2017 这个基线的 delta。</p>
+
+</div>
+</article>
+<footer>
+  <span>Compiled from arXiv:1706.03762v7</span>
+  <a href="http://arxiv.org/abs/1706.03762v7">View on arXiv →</a>
+</footer>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}, {left: '\\[', right: '\\]', display: true}, {left: '\\(', right: '\\)', display: false}], throwOnError: false, ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']})"></script>
+<script>
+(function() {
+  const buttons = document.querySelectorAll('.lang-switch button');
+  const bodies = document.querySelectorAll('.body');
+  buttons.forEach(btn => btn.addEventListener('click', () => {
+    const lang = btn.dataset.lang;
+    buttons.forEach(b => {
+      b.classList.toggle('active', b === btn);
+      b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+    });
+    bodies.forEach(body => {
+      const matches = body.dataset.lang === lang;
+      body.hidden = !matches;
+    });
+    if (window.location.hash !== '#' + lang) {
+      history.replaceState(null, '', '#' + lang);
+    }
+  }));
+  const initial = (window.location.hash || '#en').slice(1);
+  const target = document.querySelector(`.lang-switch button[data-lang="${initial}"]`);
+  if (target) target.click();
+})();
+</script>
+<script>
+(function() {
+  let currentId = null;
+  let audio = null;
+
+  function setPlaying(id, on) {
+    const sel = `.sentence[data-sentence-id="${id}"]`;
+    document.querySelectorAll(sel).forEach(el => el.classList.toggle('playing', on));
+  }
+
+  // Highlight all fragments of a sentence on hover, not just the one under cursor.
+  document.addEventListener('mouseover', e => {
+    const s = e.target.closest('.sentence');
+    if (!s) return;
+    const id = s.dataset.sentenceId;
+    if (id != null) {
+      document.querySelectorAll(`.sentence[data-sentence-id="${id}"]`)
+        .forEach(el => el.classList.add('hover'));
+    }
+  });
+  document.addEventListener('mouseout', e => {
+    const s = e.target.closest('.sentence');
+    if (!s) return;
+    const id = s.dataset.sentenceId;
+    if (id != null) {
+      document.querySelectorAll(`.sentence[data-sentence-id="${id}"]`)
+        .forEach(el => el.classList.remove('hover'));
+    }
+  });
+
+  document.addEventListener('click', e => {
+    const span = e.target.closest('.sentence');
+    if (!span) return;
+    const src = span.dataset.audio;
+    const id = span.dataset.sentenceId;
+    if (!src || id == null) return;
+    if (currentId === id && audio && !audio.paused) {
+      audio.pause();
+      setPlaying(currentId, false);
+      currentId = null;
+      return;
+    }
+    if (audio) audio.pause();
+    if (currentId !== null) setPlaying(currentId, false);
+    audio = new Audio(src);
+    audio.addEventListener('ended', () => { setPlaying(id, false); });
+    audio.play().catch(err => console.warn('audio play failed', err));
+    setPlaying(id, true);
+    currentId = id;
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+build/
+dist/
+wheels/
+
+# uv / venv
+.venv/
+.python-version.local
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.pyright/
+.mypy_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Untitled
+Untitled.*
+
+# Claude Code workspace state
+.claude/
+
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# Project output
+papers/

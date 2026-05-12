@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paperread Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,30..100;1,9..144,300..700,30..100&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bone: #F4EFE6;
+  --bone-soft: #FBF7EE;
+  --graphite: #1F1F1E;
+  --graphite-soft: #6A6A66;
+  --vermillion: #C9482A;
+  --vermillion-soft: rgba(201, 72, 42, 0.08);
+  --hairline: rgba(31, 31, 30, 0.14);
+  --serif: "Fraunces", "Iowan Old Style", "Hoefler Text", Georgia, serif;
+  --mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+  --container-width: 52rem;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--bone);
+  color: var(--graphite);
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 14, "SOFT" 50;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+main {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 5rem 1.5rem 4rem;
+}
+
+.brand {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--graphite-soft);
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+.brand .dot { color: var(--vermillion); }
+.brand-rule { border: none; border-top: 1px solid var(--hairline); margin: 0 0 2.5rem; }
+
+h1.archive-title {
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 130, "SOFT" 35;
+  font-style: italic;
+  font-weight: 350;
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.018em;
+  margin: 0 0 0.8rem;
+}
+.archive-sub {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--graphite-soft);
+  margin: 0 0 4rem;
+}
+.archive-sub .count { color: var(--vermillion); font-weight: 600; }
+
+ol.archive {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--hairline);
+}
+ol.archive li { margin: 0; }
+ol.archive li a {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  grid-template-areas:
+    "id title"
+    "id meta"
+    "id authors";
+  gap: 0.15rem 1.5rem;
+  padding: 1.5rem 0.5rem;
+  text-decoration: none;
+  color: inherit;
+  border-bottom: 1px solid var(--hairline);
+  transition: background 160ms ease, padding 220ms ease;
+}
+ol.archive li a:hover {
+  background: var(--vermillion-soft);
+  padding-left: 1rem;
+}
+ol.archive li a:hover .row-title { color: var(--vermillion); }
+.row-id {
+  grid-area: id;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--vermillion);
+  align-self: start;
+  padding-top: 0.4rem;
+}
+.row-title {
+  grid-area: title;
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 28, "wght" 450;
+  font-style: italic;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+  transition: color 160ms ease;
+}
+.row-meta {
+  grid-area: meta;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--graphite-soft);
+}
+.row-authors {
+  grid-area: authors;
+  font-family: var(--serif);
+  font-feature-settings: "smcp" on, "c2sc" on;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--graphite-soft);
+  margin-top: 0.25rem;
+}
+
+.empty {
+  font-style: italic;
+  color: var(--graphite-soft);
+  padding: 2rem 0;
+}
+.empty code {
+  font-family: var(--mono);
+  font-style: normal;
+  background: var(--vermillion-soft);
+  padding: 0.1em 0.4em;
+  border-radius: 2px;
+}
+
+footer {
+  max-width: var(--container-width);
+  margin: 5rem auto 3rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--graphite-soft);
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  main { padding: 3rem 1.25rem 2rem; }
+  ol.archive li a { grid-template-columns: 1fr; grid-template-areas: "id" "title" "meta" "authors"; gap: 0.35rem; }
+  .row-id { padding-top: 0; }
+  .row-title { font-size: 1.2rem; }
+  h1.archive-title { font-size: 2.1rem; }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bone: #1B1A18;
+    --bone-soft: #232220;
+    --graphite: #ECE5D6;
+    --graphite-soft: #948B7B;
+    --vermillion: #E36246;
+    --vermillion-soft: rgba(227, 98, 70, 0.10);
+    --hairline: rgba(236, 229, 214, 0.16);
+  }
+}
+</style>
+</head>
+<body>
+<main>
+  <div class="brand">
+    <span>Paperread</span>
+    <span class="dot">·</span>
+    <span>Archive</span>
+    <span class="dot">·</span>
+    <span>2026-05-12</span>
+  </div>
+  <hr class="brand-rule">
+  <h1 class="archive-title">Research Briefs</h1>
+  <p class="archive-sub"><span class="count">1</span> papers · curated by LLM, narrated by Edge TTS</p>
+  <ol class="archive">
+<li><a href="1706.03762v7/"><span class="row-id">1706.03762v7</span><span class="row-title">Attention Is All You Need</span><span class="row-meta">cs.CL · 2017-06-12</span><span class="row-authors">Ashish Vaswani · Noam Shazeer · Niki Parmar · et al.</span></a></li>
+</ol>
+</main>
+<footer>
+  <span>Compiled with paperread</span>
+</footer>
+</body>
+</html>
