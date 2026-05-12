@@ -306,7 +306,7 @@ _CSS = """
   --serif: "Fraunces", "Iowan Old Style", "Hoefler Text", Georgia, serif;
   --serif-cn: "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", serif;
   --mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-  --reading-width: 38rem;
+  --reading-width: 46rem;
 }
 
 * { box-sizing: border-box; }

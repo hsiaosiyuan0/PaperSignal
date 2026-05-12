@@ -11,103 +11,103 @@
       "index": 1,
       "text": "RNNs forced computation to be sequential along the input: hidden state depends on , which is fundamentally at odds with modern hardware's parallelism.",
       "hash": "ee1632ae9de6fddc",
-      "filename": "s0003.mp3"
+      "filename": "s0002.mp3"
     },
     {
       "index": 2,
       "text": "This made long sequences slow to train and harder to scale.Attention mechanisms had become a standard ingredient alongside recurrence, used mainly to bridge long distances in the input.",
       "hash": "dd47baab02e1e086",
-      "filename": "s0005.mp3"
+      "filename": "s0004.mp3"
     },
     {
       "index": 3,
       "text": "But every model still kept the recurrent backbone, and so kept its bottleneck.The paper's question is direct: can we throw away the recurrence entirely and let attention carry the whole load?",
       "hash": "1867da5330af4374",
-      "filename": "s0007.mp3"
+      "filename": "s0006.mp3"
     },
     {
       "index": 4,
       "text": "The Transformer is built from three primitives, stacked into encoder–decoder layers:Scaled dot-product attention.",
       "hash": "b847689f4a25661b",
-      "filename": "s0009.mp3"
+      "filename": "s0008.mp3"
     },
     {
       "index": 5,
       "text": "Given queries , keys , values :$1/\\sqrt{d_k}d_k$ grows.",
       "hash": "0d0ffc95c9f36574",
-      "filename": "s0011.mp3"
+      "filename": "s0010.mp3"
     },
     {
       "index": 6,
       "text": "Multi-head attention.",
       "hash": "9d3a96889d97e2b7",
-      "filename": "s0013.mp3"
+      "filename": "s0012.mp3"
     },
     {
       "index": 7,
       "text": "Project , , into different subspaces, run attention in each, concatenate the results.",
       "hash": "b24191ad812c1fcd",
-      "filename": "s0015.mp3"
+      "filename": "s0014.mp3"
     },
     {
       "index": 8,
       "text": "This lets the model attend to different positions and different representational subspaces simultaneously, instead of averaging them into a single distribution.",
       "hash": "6405fd4e43aba7a5",
-      "filename": "s0017.mp3"
+      "filename": "s0016.mp3"
     },
     {
       "index": 9,
       "text": "Positional encodings.",
       "hash": "18d52c369f0ec026",
-      "filename": "s0019.mp3"
+      "filename": "s0018.mp3"
     },
     {
       "index": 10,
       "text": "Without recurrence, the model is permutation-equivariant.",
       "hash": "3e60cd332e928777",
-      "filename": "s0021.mp3"
+      "filename": "s0020.mp3"
     },
     {
       "index": 11,
       "text": "The fix is a sinusoidal positional signal added to the input embedding:",
       "hash": "0f7bf9354d008e21",
-      "filename": "s0023.mp3"
+      "filename": "s0022.mp3"
     },
     {
       "index": 12,
       "text": "$$The choice of sinusoid (rather than learned) lets the model extrapolate to lengths longer than seen in training.The encoder is six identical layers of [self-attention → feed-forward].",
       "hash": "80180b05fad5df89",
-      "filename": "s0025.mp3"
+      "filename": "s0024.mp3"
     },
     {
       "index": 13,
       "text": "The decoder mirrors it with an added cross-attention sub-layer and masked self-attention so positions can't attend to the future.Layer TypeComplexity per layerSequential opsMax path lengthRecurrentConvolutionalSelf-attentionThe trade-off is explicit: self-attention pays in compute but collapses the maximum dependency path between any two positions to , while staying perfectly parallelizable.",
       "hash": "b4d7607b2a6e5ef2",
-      "filename": "s0027.mp3"
+      "filename": "s0026.mp3"
     },
     {
       "index": 14,
       "text": "For typical sentence lengths (), this is cheaper than RNN per layer too.Against the best 2017 models on WMT 2014 EN→DE: Transformer (big) reaches 28.4 BLEU, beating the previous best ensemble by ~2 BLEU, while training in 3.5 days on 8 P100s — a fraction of competitors' cost.The Transformer's importance was clear in retrospect but not obvious at the time: a clean architectural simplification that turned out to be the right substrate for everything downstream — BERT, GPT, ViT, CLIP, the entire modern foundation-model stack.",
       "hash": "88ad723dcdfa4e04",
-      "filename": "s0029.mp3"
+      "filename": "s0028.mp3"
     },
     {
       "index": 15,
       "text": "The mechanical contribution (scaled dot-product attention + multi-head + positional encoding) is small; the conceptual move — refusing to keep recurrence as a comfort blanket — is what mattered.What still surprises on re-reading: how little tuning was needed.",
       "hash": "558d4035a91b2a57",
-      "filename": "s0031.mp3"
+      "filename": "s0030.mp3"
     },
     {
       "index": 16,
       "text": "Three primitives, a clean residual stack, layer normalization.",
       "hash": "12e2c08db8a33f8b",
-      "filename": "s0033.mp3"
+      "filename": "s0032.mp3"
     },
     {
       "index": 17,
       "text": "Most of the \"tricks\" are interpretability conveniences, not load-bearing.Worth holding in mind: every modern attention variant (flash-attention, sliding window, MQA / GQA, rotary positional encoding) is a delta against this 2017 baseline.",
       "hash": "9847b59b53197d58",
-      "filename": "s0035.mp3"
+      "filename": "s0034.mp3"
     }
   ]
 }
