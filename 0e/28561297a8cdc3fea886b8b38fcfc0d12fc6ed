@@ -1,0 +1,19 @@
+README.md
+  s_f16df956489b28::t_2f94e60bac1f8f 1-197
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "0e28561297a8cdc3fea886b8b38fcfc0d12fc6ed",
+  "prompts": {},
+  "sessions": {
+    "s_f16df956489b28": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7af84cbc-2d77-4f8d-abb6-02d07898a70e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "hsiaosiyuan0 <hsiaosiyuan0@outlook.com>"
+    }
+  }
+}
