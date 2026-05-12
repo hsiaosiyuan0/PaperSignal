@@ -1,0 +1,19 @@
+src/paperread/report.py
+  s_f16df956489b28::t_0add5f7ab206f1 137-144,149-150,156-157,162-165,172-179
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "5c5e24e3c4f86979056fc4c25f3f819a1422988d",
+  "prompts": {},
+  "sessions": {
+    "s_f16df956489b28": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7af84cbc-2d77-4f8d-abb6-02d07898a70e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "hsiaosiyuan0 <hsiaosiyuan0@outlook.com>"
+    }
+  }
+}
