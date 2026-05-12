@@ -1,0 +1,21 @@
+src/paperread/cli.py
+  s_f16df956489b28::t_7140dd2a0489bf 636-638
+.github/workflows/deploy-pages.yml
+  s_f16df956489b28::t_147c37522435d3 29-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "b7393147f06258f39148727c92ed20ff87b59a5f",
+  "prompts": {},
+  "sessions": {
+    "s_f16df956489b28": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7af84cbc-2d77-4f8d-abb6-02d07898a70e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "hsiaosiyuan0 <hsiaosiyuan0@outlook.com>"
+    }
+  }
+}
