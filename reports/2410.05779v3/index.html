@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LightRAG: Simple and Fast Retrieval-Augmented Generation — paperread</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,30..100;1,9..144,300..700,30..100&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<style>
+:root {
+  --bone: #F4EFE6;
+  --bone-soft: #FBF7EE;
+  --graphite: #1F1F1E;
+  --graphite-soft: #6A6A66;
+  --graphite-fade: #B7B5AE;
+  --vermillion: #C9482A;
+  --vermillion-soft: rgba(201, 72, 42, 0.08);
+  --hairline: rgba(31, 31, 30, 0.14);
+  --serif: "Fraunces", "Iowan Old Style", "Hoefler Text", Georgia, serif;
+  --serif-cn: "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", serif;
+  --mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+  --reading-width: 46rem;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--bone);
+  color: var(--graphite);
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 14, "SOFT" 50;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+article {
+  max-width: var(--reading-width);
+  margin: 0 auto;
+  padding: 4.5rem 1.5rem 2rem;
+  position: relative;
+}
+
+.lang-switch {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 0.25rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.lang-switch button {
+  border: 1px solid var(--hairline);
+  background: transparent;
+  color: var(--graphite-soft);
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+.lang-switch button:hover { color: var(--vermillion); }
+.lang-switch button.active {
+  background: var(--graphite);
+  color: var(--bone);
+  border-color: var(--graphite);
+}
+
+.brand {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--graphite-soft);
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+.brand .dot { color: var(--vermillion); }
+.brand-rule { border: none; border-top: 1px solid var(--hairline); margin: 0 0 3rem; }
+
+.meta {
+  display: flex;
+  gap: 1.5rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--graphite-soft);
+  margin-bottom: 2rem;
+}
+.meta .id {
+  color: var(--vermillion);
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+h1.title {
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 130, "SOFT" 35;
+  font-style: italic;
+  font-weight: 350;
+  font-size: clamp(2.1rem, 5vw, 3.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.018em;
+  margin: 0 0 1.75rem;
+  color: var(--graphite);
+  text-wrap: balance;
+}
+
+.authors {
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 14, "wght" 500;
+  font-size: 0.78rem;
+  font-feature-settings: "smcp" on, "c2sc" on;
+  letter-spacing: 0.08em;
+  color: var(--graphite-soft);
+  margin: 0 0 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--hairline);
+  text-wrap: pretty;
+}
+
+.body { counter-reset: section; }
+.body[data-lang="zh"] { font-family: var(--serif-cn); }
+.body[data-lang="zh"] h2, .body[data-lang="zh"] h3 { font-family: var(--serif-cn); }
+
+.body h1 { display: none; }
+
+.body h2 {
+  counter-increment: section;
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 36, "wght" 500;
+  font-size: 1.55rem;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 3.5rem 0 1.1rem;
+  color: var(--graphite);
+}
+.body h2::before {
+  content: counter(section, upper-roman);
+  display: inline;
+  color: var(--vermillion);
+  font-family: var(--mono);
+  font-size: 0.62em;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  margin-right: 0.85em;
+  vertical-align: 0.2em;
+}
+
+.body h3 {
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 24, "wght" 500;
+  font-style: italic;
+  font-size: 1.18rem;
+  margin: 2.5rem 0 0.9rem;
+}
+
+.body p {
+  margin: 0 0 1.1em;
+  font-variant-numeric: lining-nums proportional-nums;
+  text-wrap: pretty;
+  hanging-punctuation: first;
+}
+
+.body a {
+  color: var(--vermillion);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(201, 72, 42, 0.35);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.body a:hover { border-bottom-color: var(--vermillion); background: var(--vermillion-soft); }
+
+.body strong { font-weight: 600; }
+.body em { font-style: italic; }
+
+.body ul, .body ol { padding-left: 1.5rem; margin: 0 0 1.2em; }
+.body li { margin-bottom: 0.35em; }
+.body li::marker { color: var(--vermillion); font-family: var(--mono); }
+
+.body code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  padding: 0.1em 0.35em;
+  background: var(--vermillion-soft);
+  color: var(--graphite);
+  border-radius: 2px;
+}
+
+.body pre {
+  font-family: var(--mono);
+  font-size: 0.82em;
+  line-height: 1.6;
+  background: rgba(31, 31, 30, 0.04);
+  border-left: 2px solid var(--vermillion);
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1.6rem 0;
+}
+.body pre code { background: none; padding: 0; border-radius: 0; }
+
+.body blockquote {
+  font-style: italic;
+  font-variation-settings: "opsz" 18;
+  margin: 1.75rem 0;
+  padding: 0 1.25rem;
+  border-left: 2px solid var(--vermillion);
+  color: var(--graphite-soft);
+}
+
+.body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.75rem 0;
+  font-size: 0.92em;
+  font-variant-numeric: tabular-nums;
+}
+.body th, .body td {
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--hairline);
+}
+.body th:first-child, .body td:first-child { padding-left: 0; }
+.body th:last-child, .body td:last-child { padding-right: 0; }
+.body thead th {
+  border-bottom: 2px solid var(--graphite);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  font-family: var(--mono);
+}
+
+.body hr { border: none; border-top: 1px solid var(--hairline); margin: 2.5rem 0; }
+
+/* KaTeX */
+.body .katex-display {
+  margin: 1.75em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25em 0;
+}
+.body .katex { font-size: 1em; color: var(--graphite); }
+.body .katex-display > .katex { display: block; text-align: center; }
+
+/* Sentence audio */
+.body[data-lang="en"] .sentence {
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+  border-radius: 1px;
+  padding: 0 0.05em;
+}
+.body[data-lang="en"] .sentence.hover,
+.body[data-lang="en"] .sentence:hover {
+  background: var(--vermillion-soft);
+}
+.body[data-lang="en"] .sentence.playing {
+  background: var(--vermillion);
+  color: var(--bone);
+}
+
+footer {
+  max-width: var(--reading-width);
+  margin: 5rem auto 3rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--graphite-soft);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+footer a { color: var(--vermillion); text-decoration: none; }
+
+@media (max-width: 640px) {
+  article { padding: 3rem 1.25rem 1.5rem; }
+  .lang-switch { top: 1rem; right: 1rem; }
+  .brand { font-size: 0.62rem; gap: 1rem; }
+  .meta { gap: 0.9rem 1.2rem; font-size: 0.68rem; }
+  h1.title { font-size: 1.95rem; }
+  .authors { font-size: 0.72rem; }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bone: #1B1A18;
+    --bone-soft: #232220;
+    --graphite: #ECE5D6;
+    --graphite-soft: #948B7B;
+    --graphite-fade: #524C42;
+    --vermillion: #E36246;
+    --vermillion-soft: rgba(227, 98, 70, 0.10);
+    --hairline: rgba(236, 229, 214, 0.16);
+  }
+}
+
+@media print {
+  body { background: white; color: black; }
+  .lang-switch { display: none; }
+  article { padding: 1in 0.75in; }
+  .brand, footer { color: #555; }
+  .body[hidden] { display: none !important; }
+}
+</style>
+</head>
+<body>
+<article>
+  <div class="lang-switch" role="tablist" aria-label="Language"><button class="active" data-lang="en" aria-selected="true">EN</button><button data-lang="zh" aria-selected="false">中</button></div>
+  <div class="brand">
+    <span>Paperread</span>
+    <span class="dot">·</span>
+    <span>Research Brief</span>
+    <span class="dot">·</span>
+    <span>2026-05-12</span>
+  </div>
+  <hr class="brand-rule">
+  <div class="meta">
+    <span class="id">arXiv / 2410.05779v3</span>
+    <span>cs.IR</span>
+    <span>Published 2024-10-08</span>
+  </div>
+  <h1 class="title">LightRAG: Simple and Fast Retrieval-Augmented Generation</h1>
+  <p class="authors">Zirui Guo · Lianghao Xia · Yanhua Yu · Tu Ao · Chao Huang</p>
+  <div class="body" data-lang="en">
+<h1>LightRAG: Simple and Fast Retrieval-Augmented Generation — Research Brief</h1>
+<h2>Background</h2>
+<p><span class="sentence" data-audio="audio/s0001.mp3" data-sentence-id="0">LightRAG (HKU + BUPT, October 2024) is the most-discussed critique-response to Microsoft's GraphRAG paper from earlier the same year.</span> <span class="sentence" data-audio="audio/s0003.mp3" data-sentence-id="1">Its starting move is to accept GraphRAG's diagnosis — flat-chunk vector RAG can't capture entity interdependencies and gives fragmented answers — and reject GraphRAG's prescription as too expensive.</span></p>
+<p><span class="sentence" data-audio="audio/s0005.mp3" data-sentence-id="2">The motivating example in the paper is sharp: a user asks </span><em><span class="sentence" data-audio="audio/s0005.mp3" data-sentence-id="2">"How does the rise of electric vehicles influence urban air quality and public transportation infrastructure?"</span></em> <span class="sentence" data-audio="audio/s0007.mp3" data-sentence-id="3">Vector RAG retrieves separate documents on EVs, air pollution, and transportation, then fails to synthesize the cross-topic relationships.</span> <span class="sentence" data-audio="audio/s0009.mp3" data-sentence-id="4">So you need graph structure.</span> <span class="sentence" data-audio="audio/s0011.mp3" data-sentence-id="5">But Microsoft GraphRAG's answer — build a community hierarchy, generate community summaries at every level, traverse them at query time — burns hundreds of thousands of tokens per query and hours to (re-)index.</span> <span class="sentence" data-audio="audio/s0013.mp3" data-sentence-id="6">In dynamic domains where data changes daily, that cost compounds.</span></p>
+<p><span class="sentence" data-audio="audio/s0015.mp3" data-sentence-id="7">LightRAG's claim: you can get the same retrieval quality (or better) with </span><strong><span class="sentence" data-audio="audio/s0015.mp3" data-sentence-id="7">a much simpler graph index and dual-level keyword retrieval</span></strong><span class="sentence" data-audio="audio/s0015.mp3" data-sentence-id="7">, while making incremental updates almost free.</span></p>
+<h2>Approach</h2>
+<p><span class="sentence" data-audio="audio/s0017.mp3" data-sentence-id="8">Three deliberate simplifications relative to Microsoft GraphRAG, each connected to one of the paper's stated efficiency goals.</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0019.mp3" data-sentence-id="9">❶ Graph-based text indexing without community summaries.</span></strong> <span class="sentence" data-audio="audio/s0021.mp3" data-sentence-id="10">Documents are chunked (1200 tokens).</span> <span class="sentence" data-audio="audio/s0023.mp3" data-sentence-id="11">An LLM extracts entities and relationships, generating short text descriptions for each.</span> <span class="sentence" data-audio="audio/s0025.mp3" data-sentence-id="12">Then — and this is the key efficiency move — a profiling function $P(\cdot)$ generates a </span><strong><span class="sentence" data-audio="audio/s0025.mp3" data-sentence-id="12">key-value pair</span></strong><span class="sentence" data-audio="audio/s0025.mp3" data-sentence-id="12"> for every node and edge:</span></p>
+<ul>
+<li><em><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">Key</span></em><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">: a word or short phrase enabling fast retrieval (entity name; for relations, multiple keys including LLM-derived "global themes")</span></li>
+<li><em><span class="sentence" data-audio="audio/s0029.mp3" data-sentence-id="14">Value</span></em><span class="sentence" data-audio="audio/s0029.mp3" data-sentence-id="14">: a paragraph summarizing relevant snippets</span></li>
+</ul>
+<p><span class="sentence" data-audio="audio/s0031.mp3" data-sentence-id="15">Duplicates are merged via a dedup function.</span> <span class="sentence" data-audio="audio/s0033.mp3" data-sentence-id="16">The resulting structure is a graph $\hat{\mathcal{D}} = (\hat{\mathcal{V}}, \hat{\mathcal{E}})$ stored as a vector DB keyed on those KV pairs.</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0035.mp3" data-sentence-id="17">Note what's missing:</span></strong><span class="sentence" data-audio="audio/s0035.mp3" data-sentence-id="17"> no community detection, no community summaries, no hierarchical aggregation.</span> <span class="sentence" data-audio="audio/s0037.mp3" data-sentence-id="18">That's the cost cut.</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0039.mp3" data-sentence-id="19">❷ Dual-level retrieval.</span></strong> <span class="sentence" data-audio="audio/s0041.mp3" data-sentence-id="20">Queries are classified along a granularity axis:</span></p>
+<ul>
+<li><em><span class="sentence" data-audio="audio/s0043.mp3" data-sentence-id="21">Low-level</span></em><span class="sentence" data-audio="audio/s0043.mp3" data-sentence-id="21"> / specific queries → "Who wrote </span><em><span class="sentence" data-audio="audio/s0043.mp3" data-sentence-id="21">Pride and Prejudice</span></em><span class="sentence" data-audio="audio/s0043.mp3" data-sentence-id="21">?" → retrieve entities + immediate edges</span></li>
+<li><em><span class="sentence" data-audio="audio/s0045.mp3" data-sentence-id="22">High-level</span></em><span class="sentence" data-audio="audio/s0045.mp3" data-sentence-id="22"> / abstract queries → "How does AI influence education?" → retrieve relations + aggregated themes</span></li>
+</ul>
+<p><span class="sentence" data-audio="audio/s0047.mp3" data-sentence-id="23">For a query, LightRAG:</span></p>
+<ol>
+<li><span class="sentence" data-audio="audio/s0049.mp3" data-sentence-id="24">Extracts both local keywords $k^{(l)}$ and global keywords $k^{(g)}$</span></li>
+<li><span class="sentence" data-audio="audio/s0051.mp3" data-sentence-id="25">Vector-matches $k^{(l)}$ to candidate entities, $k^{(g)}$ to relations</span></li>
+<li><span class="sentence" data-audio="audio/s0053.mp3" data-sentence-id="26">Gathers one-hop neighbors of the retrieved nodes and edges to add structural context</span></li>
+</ol>
+<p><span class="sentence" data-audio="audio/s0055.mp3" data-sentence-id="27">This replaces GraphRAG's expensive community-traversal map-reduce with a single keyword-matching pass.</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0057.mp3" data-sentence-id="28">❸ Incremental updates.</span></strong> <span class="sentence" data-audio="audio/s0059.mp3" data-sentence-id="29">When new documents arrive, run the same extraction over the new chunks, then </span><strong><span class="sentence" data-audio="audio/s0059.mp3" data-sentence-id="29">just take the set-union</span></strong><span class="sentence" data-audio="audio/s0059.mp3" data-sentence-id="29"> of the new entities/edges with the existing graph.</span> <span class="sentence" data-audio="audio/s0061.mp3" data-sentence-id="30">No community recomputation.</span> <span class="sentence" data-audio="audio/s0063.mp3" data-sentence-id="31">No reindexing of unchanged documents.</span> <span class="sentence" data-audio="audio/s0065.mp3" data-sentence-id="32">The new graph is simply $(\hat{\mathcal{V}} \cup \hat{\mathcal{V}}', \hat{\mathcal{E}} \cup \hat{\mathcal{E}}')$.</span></p>
+<h2>Comparison</h2>
+<p><span class="sentence" data-audio="audio/s0067.mp3" data-sentence-id="33">Evaluated on four UltraDomain datasets (Agriculture, CS, Legal, Mix), each between 600K–5M tokens.</span> <span class="sentence" data-audio="audio/s0069.mp3" data-sentence-id="34">Win-rates from LLM-as-judge (GPT-4o-mini) head-to-head, four dimensions:</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0071.mp3" data-sentence-id="35">vs. flat-chunk baselines</span></strong><span class="sentence" data-audio="audio/s0071.mp3" data-sentence-id="35"> (NaiveRAG, RQ-RAG, HyDE):</span></p>
+<table>
+<thead>
+<tr>
+<th><span class="sentence" data-audio="audio/s0073.mp3" data-sentence-id="36">Baseline</span></th>
+<th><span class="sentence" data-audio="audio/s0075.mp3" data-sentence-id="37">LightRAG win rate (overall)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="sentence" data-audio="audio/s0077.mp3" data-sentence-id="38">NaiveRAG</span></td>
+<td><span class="sentence" data-audio="audio/s0079.mp3" data-sentence-id="39">60.0% – 84.8% across datasets</span></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0081.mp3" data-sentence-id="40">RQ-RAG</span></td>
+<td><span class="sentence" data-audio="audio/s0083.mp3" data-sentence-id="41">60.0% – 85.6%</span></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0085.mp3" data-sentence-id="42">HyDE</span></td>
+<td><span class="sentence" data-audio="audio/s0087.mp3" data-sentence-id="43">57.6% – 75.2%</span></td>
+</tr>
+</tbody>
+</table>
+<p><span class="sentence" data-audio="audio/s0089.mp3" data-sentence-id="44">The win margin grows with corpus size — on the Legal dataset (largest), LightRAG beats NaiveRAG </span><strong><span class="sentence" data-audio="audio/s0089.mp3" data-sentence-id="44">83.6% / 86.4% / 83.6% / 84.8%</span></strong><span class="sentence" data-audio="audio/s0089.mp3" data-sentence-id="44"> on the four dimensions.</span> <span class="sentence" data-audio="audio/s0091.mp3" data-sentence-id="45">This is the same pattern Microsoft GraphRAG showed against vector RAG; LightRAG inherits it.</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0093.mp3" data-sentence-id="46">vs. Microsoft GraphRAG</span></strong><span class="sentence" data-audio="audio/s0093.mp3" data-sentence-id="46"> (the meaningful comparison):</span></p>
+<table>
+<thead>
+<tr>
+<th><span class="sentence" data-audio="audio/s0095.mp3" data-sentence-id="47">Dataset</span></th>
+<th><span class="sentence" data-audio="audio/s0097.mp3" data-sentence-id="48">Comprehensiveness</span></th>
+<th><span class="sentence" data-audio="audio/s0099.mp3" data-sentence-id="49">Diversity</span></th>
+<th><span class="sentence" data-audio="audio/s0101.mp3" data-sentence-id="50">Empowerment</span></th>
+<th><span class="sentence" data-audio="audio/s0103.mp3" data-sentence-id="51">Overall</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="sentence" data-audio="audio/s0105.mp3" data-sentence-id="52">Agriculture</span></td>
+<td><span class="sentence" data-audio="audio/s0107.mp3" data-sentence-id="53">54.4%</span></td>
+<td><strong><span class="sentence" data-audio="audio/s0109.mp3" data-sentence-id="54">77.2%</span></strong></td>
+<td><span class="sentence" data-audio="audio/s0111.mp3" data-sentence-id="55">58.8%</span></td>
+<td><span class="sentence" data-audio="audio/s0113.mp3" data-sentence-id="56">54.8%</span></td>
+</tr>
+<tr>
+<td>CS</td>
+<td><span class="sentence" data-audio="audio/s0115.mp3" data-sentence-id="57">51.6%</span></td>
+<td><span class="sentence" data-audio="audio/s0117.mp3" data-sentence-id="58">59.2%</span></td>
+<td><span class="sentence" data-audio="audio/s0119.mp3" data-sentence-id="59">54.8%</span></td>
+<td><span class="sentence" data-audio="audio/s0121.mp3" data-sentence-id="60">52.0%</span></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0123.mp3" data-sentence-id="61">Legal</span></td>
+<td><span class="sentence" data-audio="audio/s0125.mp3" data-sentence-id="62">51.6%</span></td>
+<td><strong><span class="sentence" data-audio="audio/s0127.mp3" data-sentence-id="63">73.6%</span></strong></td>
+<td><span class="sentence" data-audio="audio/s0129.mp3" data-sentence-id="64">56.4%</span></td>
+<td><span class="sentence" data-audio="audio/s0131.mp3" data-sentence-id="65">52.8%</span></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0133.mp3" data-sentence-id="66">Mix</span></td>
+<td><span class="sentence" data-audio="audio/s0135.mp3" data-sentence-id="67">49.6%</span></td>
+<td><span class="sentence" data-audio="audio/s0137.mp3" data-sentence-id="68">64.0%</span></td>
+<td><span class="sentence" data-audio="audio/s0139.mp3" data-sentence-id="69">49.2%</span></td>
+<td><span class="sentence" data-audio="audio/s0141.mp3" data-sentence-id="70">49.6%</span></td>
+</tr>
+</tbody>
+</table>
+<p><span class="sentence" data-audio="audio/s0143.mp3" data-sentence-id="71">Comprehensiveness and Empowerment are roughly </span><strong><span class="sentence" data-audio="audio/s0143.mp3" data-sentence-id="71">tied</span></strong><span class="sentence" data-audio="audio/s0143.mp3" data-sentence-id="71"> with GraphRAG; the consistent win is on </span><strong><span class="sentence" data-audio="audio/s0143.mp3" data-sentence-id="71">Diversity</span></strong><span class="sentence" data-audio="audio/s0143.mp3" data-sentence-id="71"> (largest gaps in Agriculture and Legal).</span> <span class="sentence" data-audio="audio/s0145.mp3" data-sentence-id="72">The dual-level retrieval surfaces broader topic mixtures than community-summary traversal — the result the authors most lean on.</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0147.mp3" data-sentence-id="73">The cost comparison is where LightRAG actually decides things.</span></strong> <span class="sentence" data-audio="audio/s0149.mp3" data-sentence-id="74">On the Legal dataset retrieval phase:</span></p>
+<table>
+<thead>
+<tr>
+<th><span class="sentence" data-audio="audio/s0151.mp3" data-sentence-id="75">Phase</span></th>
+<th><span class="sentence" data-audio="audio/s0153.mp3" data-sentence-id="76">GraphRAG</span></th>
+<th>LightRAG</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="sentence" data-audio="audio/s0157.mp3" data-sentence-id="78">Retrieval tokens (per query)</span></td>
+<td><span class="sentence" data-audio="audio/s0159.mp3" data-sentence-id="79">610 × 1,000 = </span><strong><span class="sentence" data-audio="audio/s0159.mp3" data-sentence-id="79">610K</span></strong></td>
+<td><strong><span class="sentence" data-audio="audio/s0161.mp3" data-sentence-id="80">&lt;100</span></strong></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0163.mp3" data-sentence-id="81">Retrieval API calls</span></td>
+<td><span class="sentence" data-audio="audio/s0165.mp3" data-sentence-id="82">hundreds (one per community)</span></td>
+<td><strong>1</strong></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0167.mp3" data-sentence-id="83">Incremental update</span></td>
+<td><span class="sentence" data-audio="audio/s0169.mp3" data-sentence-id="84">1,399 × 2 × 5,000 + $T_\text{extract}$ tokens</span></td>
+<td><span class="sentence" data-audio="audio/s0171.mp3" data-sentence-id="85">$T_\text{extract}$ tokens</span></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0173.mp3" data-sentence-id="86">Incremental API calls</span></td>
+<td><span class="sentence" data-audio="audio/s0175.mp3" data-sentence-id="87">2,798 + $C_\text{extract}$</span></td>
+<td>$C_\text{extract}$</td>
+</tr>
+</tbody>
+</table>
+<p><span class="sentence" data-audio="audio/s0177.mp3" data-sentence-id="89">That's </span><strong><span class="sentence" data-audio="audio/s0177.mp3" data-sentence-id="89">~6100× fewer retrieval tokens</span></strong><span class="sentence" data-audio="audio/s0177.mp3" data-sentence-id="89"> and </span><strong><span class="sentence" data-audio="audio/s0177.mp3" data-sentence-id="89">hundreds-of-thousands</span></strong><span class="sentence" data-audio="audio/s0177.mp3" data-sentence-id="89"> fewer tokens per incremental document update.</span> <span class="sentence" data-audio="audio/s0179.mp3" data-sentence-id="90">The quality is comparable on most dimensions; the cost differential is overwhelming.</span></p>
+<p><span class="sentence" data-audio="audio/s0181.mp3" data-sentence-id="91">A striking ablation result: </span><strong><span class="sentence" data-audio="audio/s0181.mp3" data-sentence-id="91">removing the original text from retrieval (</span><code>-Origin</code><span class="sentence" data-audio="audio/s0181.mp3" data-sentence-id="91"> variant) didn't hurt performance</span></strong><span class="sentence" data-audio="audio/s0181.mp3" data-sentence-id="91"> and sometimes improved it.</span> <span class="sentence" data-audio="audio/s0183.mp3" data-sentence-id="92">The graph index alone carries enough signal.</span> <span class="sentence" data-audio="audio/s0185.mp3" data-sentence-id="93">This implicitly suggests the LLM-extracted KG is denoising the corpus — and is part of why LightRAG can drop community summaries without losing quality.</span></p>
+<h2>Summary</h2>
+<p><span class="sentence" data-audio="audio/s0187.mp3" data-sentence-id="94">LightRAG is best read as the natural answer to "Microsoft GraphRAG was expensive — what's the minimal version that still works?".</span> <span class="sentence" data-audio="audio/s0189.mp3" data-sentence-id="95">The contribution is mostly in </span><em><span class="sentence" data-audio="audio/s0189.mp3" data-sentence-id="95">what you take out</span></em><span class="sentence" data-audio="audio/s0189.mp3" data-sentence-id="95">:</span></p>
+<ul>
+<li><strong><span class="sentence" data-audio="audio/s0191.mp3" data-sentence-id="96">Out</span></strong><span class="sentence" data-audio="audio/s0191.mp3" data-sentence-id="96">: hierarchical community detection, community summaries at every level, map-reduce over communities, full reindex on update</span></li>
+<li><strong><span class="sentence" data-audio="audio/s0193.mp3" data-sentence-id="97">In</span></strong><span class="sentence" data-audio="audio/s0193.mp3" data-sentence-id="97">: KV-paired graph index, dual-level (specific/abstract) keyword retrieval in a single pass, set-union for incremental updates</span></li>
+</ul>
+<p><span class="sentence" data-audio="audio/s0195.mp3" data-sentence-id="98">The headline numbers — 6100× fewer retrieval tokens, single-API-call queries, free incremental updates, win-rates on par or better than GraphRAG on most dimensions — are what made this paper one of the most-cited GraphRAG variants of 2024.</span></p>
+<p><span class="sentence" data-audio="audio/s0197.mp3" data-sentence-id="99">Where it's honest about trade-offs: comprehensiveness is roughly tied with GraphRAG (51-54% wins), not dominant.</span> <span class="sentence" data-audio="audio/s0199.mp3" data-sentence-id="100">Community summaries do carry information — you give up the ability to </span><em><span class="sentence" data-audio="audio/s0199.mp3" data-sentence-id="100">browse</span></em><span class="sentence" data-audio="audio/s0199.mp3" data-sentence-id="100"> a corpus the way you can with GraphRAG's C0-level summaries.</span> <span class="sentence" data-audio="audio/s0201.mp3" data-sentence-id="101">If you want a "structured corpus overview product surface", LightRAG doesn't give you that.</span> <span class="sentence" data-audio="audio/s0203.mp3" data-sentence-id="102">If you want a fast, cheap, dynamic-data-friendly retrieval system, it's the move.</span></p>
+<p><span class="sentence" data-audio="audio/s0205.mp3" data-sentence-id="103">The deeper signal in this paper is methodological: it validates a hypothesis the field had been circling around — </span><strong><span class="sentence" data-audio="audio/s0205.mp3" data-sentence-id="103">the value of GraphRAG comes from the graph structure itself, not from the layered LLM-summarization on top of it.</span></strong> <span class="sentence" data-audio="audio/s0207.mp3" data-sentence-id="104">Once you accept that, the natural next move is exactly what LightRAG does — keep the graph, drop the summarization, save 99%+ of the cost.</span></p>
+<p><span class="sentence" data-audio="audio/s0209.mp3" data-sentence-id="105">Open source at </span><a href="https://github.com/HKUDS/LightRAG"><span class="sentence" data-audio="audio/s0209.mp3" data-sentence-id="105">github.com/HKUDS/LightRAG</span></a><span class="sentence" data-audio="audio/s0209.mp3" data-sentence-id="105">; read alongside Microsoft GraphRAG to see the framing-vs-engineering split clearly.</span></p>
+
+  </div>
+  <div class="body" data-lang="zh" hidden>
+<h1>LightRAG: Simple and Fast Retrieval-Augmented Generation —— 研究简报</h1>
+<h2>背景</h2>
+<p>LightRAG（港大 + 北邮，2024 年 10 月）是同年早些时候 Microsoft GraphRAG 之后最受讨论的&quot;批判性回应&quot;。它的起手式是：<strong>接受 GraphRAG 的诊断</strong>（扁平 chunk + 向量 RAG 抓不住实体间的相互依赖，答案碎片化）—— 但<strong>拒绝 GraphRAG 的处方</strong>，理由是太贵。</p>
+<p>论文里的引子很尖锐：一个用户问 <em>&quot;电动车的兴起如何影响城市空气质量与公共交通基础设施？&quot;</em> 向量 RAG 会分别检索关于电动车、空气污染、公共交通的文档，但无法把这些跨主题关系合成出来。所以你<strong>需要图结构</strong>。但 Microsoft GraphRAG 给的解 —— 构社区层级、每层都生成社区摘要、查询时遍历它们 —— 单次查询烧几十万 token，索引一次得几小时。在数据每天都在变的场景下，这成本会复利累积。</p>
+<p>LightRAG 的论断：<strong>用一个更简单的图索引 + 双层 keyword 检索</strong>就能拿到一样（甚至更好）的检索质量，并且让增量更新几乎免费。</p>
+<h2>核心方案</h2>
+<p>相对 Microsoft GraphRAG 的三处刻意简化，对应论文里三个明确的效率目标。</p>
+<p><strong>❶ 不带社区摘要的图索引</strong>。文档切成 1200 token 的 chunk。LLM 抽实体和关系，为每个生成短描述。然后 —— 这是<strong>核心的效率动作</strong> —— 用一个 profiling 函数 $P(\cdot)$ 给每个节点和边都生成一个 <strong>key-value 对</strong>：</p>
+<ul>
+<li><em>Key</em>：可快速检索的一个词或短语（实体名；关系的 key 可以多个，包括 LLM 提取的&quot;全局主题&quot;）</li>
+<li><em>Value</em>：一段总结相关片段的文字</li>
+</ul>
+<p>去重函数把重复合并掉。最终结构是一张图 $\hat{\mathcal{D}} = (\hat{\mathcal{V}}, \hat{\mathcal{E}})$，存进一个以这些 KV 对为 key 的向量库。</p>
+<p><strong>注意缺了什么：没有社区检测，没有社区摘要，没有层级聚合。</strong> 这就是省下来的钱。</p>
+<p><strong>❷ 双层检索</strong>。查询沿粒度轴分类：</p>
+<ul>
+<li><em>Low-level</em> / 具体查询 → &quot;<em>Pride and Prejudice</em> 谁写的？&quot; → 检索实体 + 直接邻边</li>
+<li><em>High-level</em> / 抽象查询 → &quot;AI 怎么影响教育？&quot; → 检索关系 + 聚合主题</li>
+</ul>
+<p>对一个查询，LightRAG：</p>
+<ol>
+<li>同时抽出局部关键词 $k^{(l)}$ 和全局关键词 $k^{(g)}$</li>
+<li>向量匹配 $k^{(l)}$ 到候选实体、$k^{(g)}$ 到关系</li>
+<li>收集检索到的节点和边的一跳邻居，补充结构上下文</li>
+</ol>
+<p>这一步替换掉了 GraphRAG 那个昂贵的&quot;社区遍历 map-reduce&quot;，换成一次 keyword 匹配。</p>
+<p><strong>❸ 增量更新</strong>。新文档来了，跑同一套抽取过程过新 chunk，然后<strong>直接把新的实体 / 边和原图取并集</strong>。<strong>不重算社区</strong>。<strong>不重索引</strong>未变文档。新图就是 $(\hat{\mathcal{V}} \cup \hat{\mathcal{V}}', \hat{\mathcal{E}} \cup \hat{\mathcal{E}}')$。</p>
+<h2>与其他方案对比</h2>
+<p>四个 UltraDomain 数据集（Agriculture, CS, Legal, Mix）做评估，每个 60 万 – 500 万 token。LLM-as-judge（GPT-4o-mini）头对头胜率，四个维度：</p>
+<p><strong>vs 扁平 chunk 基线</strong>（NaiveRAG, RQ-RAG, HyDE）：</p>
+<table>
+<thead>
+<tr>
+<th>基线</th>
+<th>LightRAG 总胜率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NaiveRAG</td>
+<td>跨四个数据集 60.0% – 84.8%</td>
+</tr>
+<tr>
+<td>RQ-RAG</td>
+<td>60.0% – 85.6%</td>
+</tr>
+<tr>
+<td>HyDE</td>
+<td>57.6% – 75.2%</td>
+</tr>
+</tbody>
+</table>
+<p>胜率随语料规模增大 —— Legal 数据集（最大）上 LightRAG 把 NaiveRAG 打成 <strong>83.6% / 86.4% / 83.6% / 84.8%</strong>（四个维度）。这和 Microsoft GraphRAG 当年对向量 RAG 的对比是同一个 pattern，LightRAG 继承了这个优势。</p>
+<p><strong>vs Microsoft GraphRAG</strong>（这才是有意义的对比）：</p>
+<table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>Comprehensiveness</th>
+<th>Diversity</th>
+<th>Empowerment</th>
+<th>Overall</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agriculture</td>
+<td>54.4%</td>
+<td><strong>77.2%</strong></td>
+<td>58.8%</td>
+<td>54.8%</td>
+</tr>
+<tr>
+<td>CS</td>
+<td>51.6%</td>
+<td>59.2%</td>
+<td>54.8%</td>
+<td>52.0%</td>
+</tr>
+<tr>
+<td>Legal</td>
+<td>51.6%</td>
+<td><strong>73.6%</strong></td>
+<td>56.4%</td>
+<td>52.8%</td>
+</tr>
+<tr>
+<td>Mix</td>
+<td>49.6%</td>
+<td>64.0%</td>
+<td>49.2%</td>
+<td>49.6%</td>
+</tr>
+</tbody>
+</table>
+<p>Comprehensiveness 和 Empowerment 与 GraphRAG <strong>基本打平</strong>；稳定胜出的是 <strong>Diversity</strong>（Agriculture 和 Legal 上差距最大）。双层检索召回的主题混合范围比社区摘要遍历更广 —— <strong>这是论文最仰仗的那个结果</strong>。</p>
+<p><strong>真正决定胜负的是成本对比</strong>。Legal 数据集的检索阶段：</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>GraphRAG</th>
+<th>LightRAG</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>每次查询的检索 tokens</td>
+<td>610 × 1,000 = <strong>61 万</strong></td>
+<td><strong>&lt; 100</strong></td>
+</tr>
+<tr>
+<td>检索 API 调用数</td>
+<td>数百次（每个社区一次）</td>
+<td><strong>1</strong></td>
+</tr>
+<tr>
+<td>增量更新 tokens</td>
+<td>1,399 × 2 × 5,000 + $T_\text{extract}$</td>
+<td>$T_\text{extract}$</td>
+</tr>
+<tr>
+<td>增量更新 API 调用</td>
+<td>2,798 + $C_\text{extract}$</td>
+<td>$C_\text{extract}$</td>
+</tr>
+</tbody>
+</table>
+<p><strong>检索 token 少了大约 6100 倍</strong>，每篇增量文档的更新少了<strong>几十万</strong>的 token。质量大部分维度可比，但成本差距是碾压性的。</p>
+<p>一个引人注目的 ablation 结果：<strong>把原始文本从检索里去掉（<code>-Origin</code> 变体），性能并没有显著下降</strong>，有时候反而更好。<strong>单凭图索引就有足够信号</strong>。这隐含地说明 LLM 抽出来的 KG 在给语料去噪 —— 也是 LightRAG 可以砍掉社区摘要而不掉质量的部分原因。</p>
+<h2>总结</h2>
+<p>读这篇 LightRAG 最好的姿势是把它当作&quot;Microsoft GraphRAG 太贵了 —— 最小可行版本是什么&quot;这个问题的自然答案。<strong>它的贡献多数在&quot;减掉了什么&quot;</strong>：</p>
+<ul>
+<li><strong>去掉</strong>：层级社区检测、各层级社区摘要、社区上的 map-reduce、更新时的全量重索引</li>
+<li><strong>留下</strong>：KV 配对的图索引、单次过程内的双层（具体 / 抽象）keyword 检索、增量更新的集合并</li>
+</ul>
+<p>最显眼的数字 —— 检索 token 少 6100 倍、单 API 调用查询、近乎免费的增量更新、大部分维度上与 GraphRAG 平手或更优 —— 让这篇成为 2024 年被引用最多的 GraphRAG 变体之一。</p>
+<p>它对 trade-off 也坦诚：Comprehensiveness 与 GraphRAG <strong>大致打平</strong>（51-54% 胜率），并不碾压。社区摘要确实承载了一些信息 —— 你失去了像 GraphRAG 那样<strong>用 C0 级摘要浏览整个语料</strong>的能力。如果你要的是&quot;结构化语料概览作为产品表面&quot;，LightRAG 给不了。如果你要的是快、便宜、对动态数据友好的检索系统，<strong>就是它</strong>。</p>
+<p>这篇论文更深一层的方法论信号是：<strong>GraphRAG 的价值来源于图结构本身，而不是叠在它上面的 LLM 摘要</strong>。一旦接受这个判断，自然的下一步就正是 LightRAG 干的事 —— 保留图、丢掉摘要、省 99%+ 的成本。</p>
+<p>开源在 <a href="https://github.com/HKUDS/LightRAG">github.com/HKUDS/LightRAG</a>；和 Microsoft GraphRAG 配着读，能很清楚地看到&quot;framing 与工程&quot;两层的分野。</p>
+
+</div>
+</article>
+<footer>
+  <span>Compiled from arXiv:2410.05779v3</span>
+  <a href="http://arxiv.org/abs/2410.05779v3">View on arXiv →</a>
+</footer>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}, {left: '\\[', right: '\\]', display: true}, {left: '\\(', right: '\\)', display: false}], throwOnError: false, ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']})"></script>
+<script>
+(function() {
+  const buttons = document.querySelectorAll('.lang-switch button');
+  const bodies = document.querySelectorAll('.body');
+  buttons.forEach(btn => btn.addEventListener('click', () => {
+    const lang = btn.dataset.lang;
+    buttons.forEach(b => {
+      b.classList.toggle('active', b === btn);
+      b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+    });
+    bodies.forEach(body => {
+      const matches = body.dataset.lang === lang;
+      body.hidden = !matches;
+    });
+    if (window.location.hash !== '#' + lang) {
+      history.replaceState(null, '', '#' + lang);
+    }
+  }));
+  const initial = (window.location.hash || '#en').slice(1);
+  const target = document.querySelector(`.lang-switch button[data-lang="${initial}"]`);
+  if (target) target.click();
+})();
+</script>
+<script>
+(function() {
+  let currentId = null;
+  let audio = null;
+
+  function setPlaying(id, on) {
+    const sel = `.sentence[data-sentence-id="${id}"]`;
+    document.querySelectorAll(sel).forEach(el => el.classList.toggle('playing', on));
+  }
+
+  // Highlight all fragments of a sentence on hover, not just the one under cursor.
+  document.addEventListener('mouseover', e => {
+    const s = e.target.closest('.sentence');
+    if (!s) return;
+    const id = s.dataset.sentenceId;
+    if (id != null) {
+      document.querySelectorAll(`.sentence[data-sentence-id="${id}"]`)
+        .forEach(el => el.classList.add('hover'));
+    }
+  });
+  document.addEventListener('mouseout', e => {
+    const s = e.target.closest('.sentence');
+    if (!s) return;
+    const id = s.dataset.sentenceId;
+    if (id != null) {
+      document.querySelectorAll(`.sentence[data-sentence-id="${id}"]`)
+        .forEach(el => el.classList.remove('hover'));
+    }
+  });
+
+  document.addEventListener('click', e => {
+    const span = e.target.closest('.sentence');
+    if (!span) return;
+    const src = span.dataset.audio;
+    const id = span.dataset.sentenceId;
+    if (!src || id == null) return;
+    if (currentId === id && audio && !audio.paused) {
+      audio.pause();
+      setPlaying(currentId, false);
+      currentId = null;
+      return;
+    }
+    if (audio) audio.pause();
+    if (currentId !== null) setPlaying(currentId, false);
+    audio = new Audio(src);
+    audio.addEventListener('ended', () => { setPlaying(id, false); });
+    audio.play().catch(err => console.warn('audio play failed', err));
+    setPlaying(id, true);
+    currentId = id;
+  });
+})();
+</script>
+</body>
+</html>

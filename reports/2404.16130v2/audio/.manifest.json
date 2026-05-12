@@ -1,0 +1,407 @@
+{
+  "voice": "en-US-AvaMultilingualNeural",
+  "sentences": [
+    {
+      "index": 0,
+      "text": "Vector RAG — the canonical \"embed-chunks-and-retrieve-top-k\" pipeline — answers local questions well: anything where the answer lives in a small, identifiable subset of the corpus.",
+      "hash": "cac3bdbf76f0325e",
+      "filename": "s0001.mp3"
+    },
+    {
+      "index": 1,
+      "text": "Where it falls apart is on global sensemaking questions, the kind that require reasoning over an entire dataset: \"What are the main themes here?\", \"How do these documents collectively view X?\", \"What patterns connect these events?\".",
+      "hash": "ef94e50363840831",
+      "filename": "s0003.mp3"
+    },
+    {
+      "index": 2,
+      "text": "The paper frames this with a sharp diagnosis.",
+      "hash": "2a128b2ca8f2750f",
+      "filename": "s0005.mp3"
+    },
+    {
+      "index": 3,
+      "text": "Vector RAG can't answer global questions because no individual record contains the answer — the answer is a property of the collection.",
+      "hash": "8812f230a08e8977",
+      "filename": "s0007.mp3"
+    },
+    {
+      "index": 4,
+      "text": "Earlier query-focused summarization (QFS) methods could handle the conceptual task but don't scale past tens of documents.",
+      "hash": "0dbaf067631f9fc6",
+      "filename": "s0009.mp3"
+    },
+    {
+      "index": 5,
+      "text": "Meanwhile, LLM context windows have grown enough that you might naïvely stuff a corpus in — but at million-token scale that's neither affordable nor reliable (degraded recall in long contexts is well-documented).",
+      "hash": "8222127967baa4c1",
+      "filename": "s0011.mp3"
+    },
+    {
+      "index": 6,
+      "text": "The space between these failure modes is what GraphRAG is built to occupy.",
+      "hash": "f5059d8eb05a9208",
+      "filename": "s0013.mp3"
+    },
+    {
+      "index": 7,
+      "text": "This paper is, in retrospect, the work that named and defined what the community now calls \"the GraphRAG paradigm.\"",
+      "hash": "32b64cd0d0b3bd7d",
+      "filename": "s0015.mp3"
+    },
+    {
+      "index": 8,
+      "text": "Most of the 2024-2025 GraphRAG ecosystem (LightRAG, MedGraphRAG, StructRAG, the entire DEEP-PolyU survey taxonomy) is structured as variations on or critiques of what this paper proposed.",
+      "hash": "b480082d9c894ab8",
+      "filename": "s0017.mp3"
+    },
+    {
+      "index": 9,
+      "text": "GraphRAG converts a text corpus into a hierarchical, queryable artifact in five stages:",
+      "hash": "805f768ea2a61854",
+      "filename": "s0019.mp3"
+    },
+    {
+      "index": 10,
+      "text": "❶ Chunks → Entities & Relationships.",
+      "hash": "a1691ebb3864f3f9",
+      "filename": "s0021.mp3"
+    },
+    {
+      "index": 11,
+      "text": "Documents are split into 600-token chunks (with 100-token overlap).",
+      "hash": "43de20ae30bc2a82",
+      "filename": "s0023.mp3"
+    },
+    {
+      "index": 12,
+      "text": "An LLM is prompted with few-shot exemplars to extract typed entities, the relationships between them, and short descriptions of each.",
+      "hash": "4e86cc3e4bf62096",
+      "filename": "s0025.mp3"
+    },
+    {
+      "index": 13,
+      "text": "Claims — verifiable factual statements about entities — are extracted in a parallel pass.",
+      "hash": "24ea7a7dedd2c244",
+      "filename": "s0027.mp3"
+    },
+    {
+      "index": 14,
+      "text": "Domain tuning happens by swapping out the exemplars, not by retraining.",
+      "hash": "96369629f2d0060c",
+      "filename": "s0029.mp3"
+    },
+    {
+      "index": 15,
+      "text": "❷ Entities → Knowledge Graph.",
+      "hash": "258163621a2fdc3b",
+      "filename": "s0031.mp3"
+    },
+    {
+      "index": 16,
+      "text": "Duplicates across chunks are merged (exact string match in their implementation, but soft matching works too).",
+      "hash": "efedc69bb066803a",
+      "filename": "s0033.mp3"
+    },
+    {
+      "index": 17,
+      "text": "Edge weights record how often a relationship was extracted; descriptions are aggregated per node/edge.",
+      "hash": "aadb41879aef4ab7",
+      "filename": "s0035.mp3"
+    },
+    {
+      "index": 18,
+      "text": "Resulting graphs in their experiments: Podcast dataset → 8,564 nodes / 20,691 edges; News dataset → 15,754 nodes / 19,520 edges.",
+      "hash": "086585ee80e944c5",
+      "filename": "s0037.mp3"
+    },
+    {
+      "index": 19,
+      "text": "❸ Graph → Communities.",
+      "hash": "cec7bd1f2a92981a",
+      "filename": "s0039.mp3"
+    },
+    {
+      "index": 20,
+      "text": "Hierarchical Leiden community detection partitions the graph at multiple levels (C0 root → C3 leaf), giving a mutually exclusive, collectively exhaustive coverage of every node at each level.",
+      "hash": "737dfe417144f7e8",
+      "filename": "s0041.mp3"
+    },
+    {
+      "index": 21,
+      "text": "This is the move that makes \"global → local\" navigation possible.",
+      "hash": "cf1195c24ae5ce4f",
+      "filename": "s0043.mp3"
+    },
+    {
+      "index": 22,
+      "text": "❹ Communities → Community Summaries.",
+      "hash": "dd2aeebe0320d9dc",
+      "filename": "s0045.mp3"
+    },
+    {
+      "index": 23,
+      "text": "Bottom-up summarization: leaf communities are summarized first; higher-level summaries are recursively built from their children's summaries when token limits force compression.",
+      "hash": "a551071284cef795",
+      "filename": "s0047.mp3"
+    },
+    {
+      "index": 24,
+      "text": "The result is a hierarchy of report-like summaries you can scan top-down to understand the corpus without any query at all.",
+      "hash": "9c3112452f9716dc",
+      "filename": "s0049.mp3"
+    },
+    {
+      "index": 25,
+      "text": "❺ Query → Global Answer (map-reduce).",
+      "hash": "f60e7d9a137b127c",
+      "filename": "s0051.mp3"
+    },
+    {
+      "index": 26,
+      "text": "Given a user query:",
+      "hash": "b21989d2c848a316",
+      "filename": "s0053.mp3"
+    },
+    {
+      "index": 27,
+      "text": "Map: each community summary independently generates a partial answer plus a 0-100 helpfulness score.",
+      "hash": "9081f25a07de33e2",
+      "filename": "s0055.mp3"
+    },
+    {
+      "index": 28,
+      "text": "Reduce: partial answers are sorted by helpfulness, packed into one context window, and the LLM produces the final global answer.",
+      "hash": "3d975c76115dbea4",
+      "filename": "s0057.mp3"
+    },
+    {
+      "index": 29,
+      "text": "For evaluation, they also propose an adaptive benchmarking method: persona-prompted question generation (5 personas × 5 tasks × 5 questions = 125 questions per corpus), avoiding the trap of generating questions directly from the corpus they're testing on.",
+      "hash": "88cfa6c39045112a",
+      "filename": "s0059.mp3"
+    },
+    {
+      "index": 30,
+      "text": "Head-to-head LLM-as-judge against six conditions on two ~1M-token corpora (Podcast transcripts, News articles):",
+      "hash": "ca311e851ce6a125",
+      "filename": "s0061.mp3"
+    },
+    {
+      "index": 31,
+      "text": "Conditions compared",
+      "hash": "6c22a22737a89e69",
+      "filename": "s0063.mp3"
+    },
+    {
+      "index": 32,
+      "text": "Comprehensiveness",
+      "hash": "5074f839c099452e",
+      "filename": "s0065.mp3"
+    },
+    {
+      "index": 33,
+      "text": "Diversity",
+      "hash": "dcb3f6f3ca9a95e3",
+      "filename": "s0067.mp3"
+    },
+    {
+      "index": 34,
+      "text": "Empowerment",
+      "hash": "8e587196edcedeb5",
+      "filename": "s0069.mp3"
+    },
+    {
+      "index": 35,
+      "text": "Directness",
+      "hash": "d415975427a619b0",
+      "filename": "s0071.mp3"
+    },
+    {
+      "index": 36,
+      "text": "Any GraphRAG (C0–C3) vs Vector RAG (SS)",
+      "hash": "84d44b5321b2d82e",
+      "filename": "s0073.mp3"
+    },
+    {
+      "index": 37,
+      "text": "72–83% win",
+      "hash": "e217884438624085",
+      "filename": "s0075.mp3"
+    },
+    {
+      "index": 38,
+      "text": "62–82% win",
+      "hash": "df93c7bb59bf1730",
+      "filename": "s0077.mp3"
+    },
+    {
+      "index": 39,
+      "text": "mixed",
+      "hash": "b746d79201944bf5",
+      "filename": "s0079.mp3"
+    },
+    {
+      "index": 40,
+      "text": "loses (SS wins on directness)",
+      "hash": "c16321c94889b265",
+      "filename": "s0081.mp3"
+    },
+    {
+      "index": 41,
+      "text": "GraphRAG C1–C3 vs Text Summarization (TS)",
+      "hash": "8df0c0d6cf75e856",
+      "filename": "s0083.mp3"
+    },
+    {
+      "index": 42,
+      "text": "slight win",
+      "hash": "17e0d9f4fa0d436d",
+      "filename": "s0085.mp3"
+    },
+    {
+      "index": 43,
+      "text": "slight win",
+      "hash": "17e0d9f4fa0d436d",
+      "filename": "s0087.mp3"
+    },
+    {
+      "index": 44,
+      "text": "mixed",
+      "hash": "b746d79201944bf5",
+      "filename": "s0089.mp3"
+    },
+    {
+      "index": 45,
+      "text": "mixed",
+      "hash": "b746d79201944bf5",
+      "filename": "s0091.mp3"
+    },
+    {
+      "index": 46,
+      "text": "Root-level community (C0)",
+      "hash": "b6573cf3551ab5f6",
+      "filename": "s0093.mp3"
+    },
+    {
+      "index": 47,
+      "text": "tokens per query: 9× to 43× fewer than TS",
+      "hash": "41f42c2b7e3f6c98",
+      "filename": "s0095.mp3"
+    },
+    {
+      "index": 48,
+      "text": "The win-rate result is the load-bearing finding: against conventional vector RAG on global sensemaking, GraphRAG isn't 5% better, it's preferred 3-out-of-4 times on what users actually want from these questions (comprehensiveness, diversity).",
+      "hash": "9a1b6f22821b5975",
+      "filename": "s0097.mp3"
+    },
+    {
+      "index": 49,
+      "text": "Vector RAG still wins on \"directness\" because it produces shorter, more focused answers — which the authors deliberately track as a control variable, since you'd expect any verbose-but-thorough approach to lose on conciseness.",
+      "hash": "28e27352a54158a9",
+      "filename": "s0099.mp3"
+    },
+    {
+      "index": 50,
+      "text": "Within GraphRAG itself, C0 (root-level community summaries) is the sweet spot: it dominates token cost (9-43× cheaper than text-only map-reduce) while being competitive on quality with deeper levels.",
+      "hash": "572c295dd61a7619",
+      "filename": "s0101.mp3"
+    },
+    {
+      "index": 51,
+      "text": "The hierarchy isn't just an artifact — different levels are genuinely operationally different products, and you should pick C0 for cheap-and-good, C2/C3 for detail-heavy queries.",
+      "hash": "10577291a92187e8",
+      "filename": "s0103.mp3"
+    },
+    {
+      "index": 52,
+      "text": "Important honest disclosure in the paper: graph indexing for the Podcast dataset took 281 minutes on the experimental rig with a public OpenAI endpoint.",
+      "hash": "690b92f3a08a8047",
+      "filename": "s0105.mp3"
+    },
+    {
+      "index": 53,
+      "text": "This is the trade — heavy one-time indexing cost in exchange for cheap, high-quality queries afterwards.",
+      "hash": "31999c67621a2abf",
+      "filename": "s0107.mp3"
+    },
+    {
+      "index": 54,
+      "text": "It's the single biggest critique LightRAG and successors have leveled at this paper.",
+      "hash": "b7efecf0d92cc308",
+      "filename": "s0109.mp3"
+    },
+    {
+      "index": 55,
+      "text": "This paper is the right one to read if you want to internalize what \"modern GraphRAG\" actually means.",
+      "hash": "44c98462e41ad4c0",
+      "filename": "s0111.mp3"
+    },
+    {
+      "index": 56,
+      "text": "Four things stand out:",
+      "hash": "c5eedc8c0f8e1ee6",
+      "filename": "s0113.mp3"
+    },
+    {
+      "index": 57,
+      "text": "The framing is the breakthrough, not the engineering.",
+      "hash": "2047db13e34cb283",
+      "filename": "s0115.mp3"
+    },
+    {
+      "index": 58,
+      "text": "Naming the gap between vector RAG (local) and QFS (doesn't scale) and proposing community-summary hierarchies as the bridge is what changed the field.",
+      "hash": "e7ce4218db2673db",
+      "filename": "s0117.mp3"
+    },
+    {
+      "index": 59,
+      "text": "The individual techniques (LLM entity extraction, Leiden, map-reduce) are well-known on their own.",
+      "hash": "983c6c157022f4ab",
+      "filename": "s0119.mp3"
+    },
+    {
+      "index": 60,
+      "text": "The community hierarchy is a real product surface, not an implementation detail.",
+      "hash": "b38956180b2cd970",
+      "filename": "s0121.mp3"
+    },
+    {
+      "index": 61,
+      "text": "C0 root summaries can be browsed without queries — they're effectively a structured overview of a corpus, which has independent utility beyond answering questions.",
+      "hash": "84cd8dfca415c707",
+      "filename": "s0123.mp3"
+    },
+    {
+      "index": 62,
+      "text": "Adaptive benchmarking is methodologically interesting: persona-driven question synthesis sidesteps the absence of ground-truth answers for global queries, and the LLM-as-judge framework with directness-as-control is the right shape for evaluating these systems honestly.",
+      "hash": "2b748def654f7030",
+      "filename": "s0125.mp3"
+    },
+    {
+      "index": 63,
+      "text": "The indexing cost is real and is the central tension in everything that came after.",
+      "hash": "0f7e5eb7cd1e7d7f",
+      "filename": "s0127.mp3"
+    },
+    {
+      "index": 64,
+      "text": "LightRAG drops community summaries for double-level keyword indexing because of this; StructRAG routes between structures partly to avoid it; MedGraphRAG narrows to domain KGs.",
+      "hash": "a971e20a61353686",
+      "filename": "s0129.mp3"
+    },
+    {
+      "index": 65,
+      "text": "Read this paper, then read LightRAG to see what falls out when you take the cost critique seriously.",
+      "hash": "c126a1686b41070e",
+      "filename": "s0131.mp3"
+    },
+    {
+      "index": 66,
+      "text": "Released open-source at github.com/microsoft/graphrag, and incorporated into LangChain, LlamaIndex, NebulaGraph, Neo4J extensions — the canonical reference implementation for the paradigm.",
+      "hash": "d15313562d30be54",
+      "filename": "s0133.mp3"
+    }
+  ]
+}
