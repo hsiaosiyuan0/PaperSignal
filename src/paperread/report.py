@@ -134,26 +134,49 @@ class _TextSpan:
 def _collect_plain_text(soup: BeautifulSoup) -> tuple[str, list[_TextSpan]]:
     """Walk the soup in document order, building plain text from wrappable nodes.
 
-    `node_map` lets us map back from plain-text offsets to the originating text
-    node so we can splice spans into the right place.
+    Inserts a `\\n\\n` separator (not mapped to any node) between text from
+    different wrappable parents (paragraphs, list items, etc.). Without it,
+    pysbd sees `"...scale.Attention mechanisms..."` and won't split because
+    there's no space after the period.
+
+    `node_map` lets us map back from plain-text offsets to the originating
+    text node so we can splice spans into the right place; the separator
+    bytes belong to no node and won't end up inside any wrapped span.
     """
     plain_parts: list[str] = []
     node_map: list[_TextSpan] = []
     cursor = 0
+    current_block: int | None = None
+    separator = "\n\n"
     for node in soup.descendants:
         if not isinstance(node, NavigableString):
             continue
         if _has_skipped_ancestor(node):
             continue
-        if not _parent_chain_includes_wrappable(node):
+        block = _nearest_wrappable_id(node)
+        if block is None:
             continue
         text = str(node)
         if not text:
             continue
+        if current_block is not None and block != current_block:
+            plain_parts.append(separator)
+            cursor += len(separator)
+        current_block = block
         node_map.append(_TextSpan(node=node, start=cursor, end=cursor + len(text)))
         plain_parts.append(text)
         cursor += len(text)
     return "".join(plain_parts), node_map
+
+
+def _nearest_wrappable_id(node: NavigableString) -> int | None:
+    """Return id() of the nearest wrappable ancestor, or None if outside one."""
+    cur = node.parent
+    while cur is not None and getattr(cur, "name", None):
+        if cur.name in _WRAPPABLE_PARENTS:
+            return id(cur)
+        cur = cur.parent
+    return None
 
 
 def _has_skipped_ancestor(node: NavigableString) -> bool:

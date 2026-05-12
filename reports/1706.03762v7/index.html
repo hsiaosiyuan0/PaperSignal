@@ -342,64 +342,64 @@ footer a { color: var(--vermillion); text-decoration: none; }
   <div class="body" data-lang="en">
 <h1>Attention Is All You Need — Research Brief</h1>
 <h2>Background</h2>
-<p><span class="sentence" data-audio="audio/s0001.mp3" data-sentence-id="0">The dominant approach to sequence transduction in 2017 — translation, summarization, speech recognition — relied on recurrent neural networks (LSTMs, GRUs) or convolutional architectures.</span> <span class="sentence" data-audio="audio/s0002.mp3" data-sentence-id="1">RNNs forced computation to be </span><strong><span class="sentence" data-audio="audio/s0002.mp3" data-sentence-id="1">sequential along the input</span></strong><span class="sentence" data-audio="audio/s0002.mp3" data-sentence-id="1">: hidden state $h_t$ depends on $h_{t-1}$, which is fundamentally at odds with modern hardware's parallelism.</span> <span class="sentence" data-audio="audio/s0004.mp3" data-sentence-id="2">This made long sequences slow to train and harder to scale.</span></p>
-<p><span class="sentence" data-audio="audio/s0004.mp3" data-sentence-id="2">Attention mechanisms had become a standard ingredient </span><em><span class="sentence" data-audio="audio/s0004.mp3" data-sentence-id="2">alongside</span></em><span class="sentence" data-audio="audio/s0004.mp3" data-sentence-id="2"> recurrence, used mainly to bridge long distances in the input.</span> <span class="sentence" data-audio="audio/s0006.mp3" data-sentence-id="3">But every model still kept the recurrent backbone, and so kept its bottleneck.</span></p>
-<p><span class="sentence" data-audio="audio/s0006.mp3" data-sentence-id="3">The paper's question is direct: </span><strong><span class="sentence" data-audio="audio/s0006.mp3" data-sentence-id="3">can we throw away the recurrence entirely and let attention carry the whole load?</span></strong></p>
+<p><span class="sentence" data-audio="audio/s0001.mp3" data-sentence-id="0">The dominant approach to sequence transduction in 2017 — translation, summarization, speech recognition — relied on recurrent neural networks (LSTMs, GRUs) or convolutional architectures.</span> <span class="sentence" data-audio="audio/s0003.mp3" data-sentence-id="1">RNNs forced computation to be </span><strong><span class="sentence" data-audio="audio/s0003.mp3" data-sentence-id="1">sequential along the input</span></strong><span class="sentence" data-audio="audio/s0003.mp3" data-sentence-id="1">: hidden state $h_t$ depends on $h_{t-1}$, which is fundamentally at odds with modern hardware's parallelism.</span> <span class="sentence" data-audio="audio/s0005.mp3" data-sentence-id="2">This made long sequences slow to train and harder to scale.</span></p>
+<p><span class="sentence" data-audio="audio/s0007.mp3" data-sentence-id="3">Attention mechanisms had become a standard ingredient </span><em><span class="sentence" data-audio="audio/s0007.mp3" data-sentence-id="3">alongside</span></em><span class="sentence" data-audio="audio/s0007.mp3" data-sentence-id="3"> recurrence, used mainly to bridge long distances in the input.</span> <span class="sentence" data-audio="audio/s0009.mp3" data-sentence-id="4">But every model still kept the recurrent backbone, and so kept its bottleneck.</span></p>
+<p><span class="sentence" data-audio="audio/s0011.mp3" data-sentence-id="5">The paper's question is direct: </span><strong><span class="sentence" data-audio="audio/s0011.mp3" data-sentence-id="5">can we throw away the recurrence entirely and let attention carry the whole load?</span></strong></p>
 <h2>Approach</h2>
-<p><span class="sentence" data-audio="audio/s0008.mp3" data-sentence-id="4">The Transformer is built from three primitives, stacked into encoder–decoder layers:</span></p>
+<p><span class="sentence" data-audio="audio/s0013.mp3" data-sentence-id="6">The Transformer is built from three primitives, stacked into encoder–decoder layers:</span></p>
 <ol>
-<li><strong><span class="sentence" data-audio="audio/s0008.mp3" data-sentence-id="4">Scaled dot-product attention</span></strong><span class="sentence" data-audio="audio/s0008.mp3" data-sentence-id="4">.</span> <span class="sentence" data-audio="audio/s0010.mp3" data-sentence-id="5">Given queries $Q$, keys $K$, values $V$:</span></li>
+<li><strong><span class="sentence" data-audio="audio/s0015.mp3" data-sentence-id="7">Scaled dot-product attention</span></strong><span class="sentence" data-audio="audio/s0015.mp3" data-sentence-id="7">.</span> <span class="sentence" data-audio="audio/s0017.mp3" data-sentence-id="8">Given queries $Q$, keys $K$, values $V$:</span></li>
 </ol>
-<p><span class="sentence" data-audio="audio/s0010.mp3" data-sentence-id="5">$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$</span></p>
-<p><span class="sentence" data-audio="audio/s0010.mp3" data-sentence-id="5">The scaling factor $1/\sqrt{d_k}$ keeps softmax gradients in a usable range as $d_k$ grows.</span></p>
+<p>$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$</p>
+<p><span class="sentence" data-audio="audio/s0019.mp3" data-sentence-id="10">The scaling factor $1/\sqrt{d_k}$ keeps softmax gradients in a usable range as $d_k$ grows.</span></p>
 <ol start="2">
 <li>
-<p><strong><span class="sentence" data-audio="audio/s0012.mp3" data-sentence-id="6">Multi-head attention</span></strong><span class="sentence" data-audio="audio/s0012.mp3" data-sentence-id="6">.</span> <span class="sentence" data-audio="audio/s0014.mp3" data-sentence-id="7">Project $Q$, $K$, $V$ into $h$ different subspaces, run attention in each, concatenate the results.</span> <span class="sentence" data-audio="audio/s0016.mp3" data-sentence-id="8">This lets the model attend to different positions and different representational subspaces simultaneously, instead of averaging them into a single distribution.</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0021.mp3" data-sentence-id="11">Multi-head attention</span></strong><span class="sentence" data-audio="audio/s0021.mp3" data-sentence-id="11">.</span> <span class="sentence" data-audio="audio/s0023.mp3" data-sentence-id="12">Project $Q$, $K$, $V$ into $h$ different subspaces, run attention in each, concatenate the results.</span> <span class="sentence" data-audio="audio/s0025.mp3" data-sentence-id="13">This lets the model attend to different positions and different representational subspaces simultaneously, instead of averaging them into a single distribution.</span></p>
 </li>
 <li>
-<p><strong><span class="sentence" data-audio="audio/s0018.mp3" data-sentence-id="9">Positional encodings</span></strong><span class="sentence" data-audio="audio/s0018.mp3" data-sentence-id="9">.</span> <span class="sentence" data-audio="audio/s0020.mp3" data-sentence-id="10">Without recurrence, the model is permutation-equivariant.</span> <span class="sentence" data-audio="audio/s0022.mp3" data-sentence-id="11">The fix is a sinusoidal positional signal added to the input embedding:</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="14">Positional encodings</span></strong><span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="14">.</span> <span class="sentence" data-audio="audio/s0029.mp3" data-sentence-id="15">Without recurrence, the model is permutation-equivariant.</span> <span class="sentence" data-audio="audio/s0031.mp3" data-sentence-id="16">The fix is a sinusoidal positional signal added to the input embedding:</span></p>
 </li>
 </ol>
-<p><span class="sentence" data-audio="audio/s0024.mp3" data-sentence-id="12">$$PE_{(pos, 2i)} = \sin(pos / 10000^{2i/d_{\text{model}}})$$</span></p>
-<p><span class="sentence" data-audio="audio/s0024.mp3" data-sentence-id="12">The choice of sinusoid (rather than learned) lets the model extrapolate to lengths longer than seen in training.</span></p>
-<p><span class="sentence" data-audio="audio/s0024.mp3" data-sentence-id="12">The encoder is six identical layers of [self-attention → feed-forward].</span> <span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">The decoder mirrors it with an added cross-attention sub-layer and masked self-attention so positions can't attend to the future.</span></p>
+<p>$$PE_{(pos, 2i)} = \sin(pos / 10000^{2i/d_{\text{model}}})$$</p>
+<p><span class="sentence" data-audio="audio/s0033.mp3" data-sentence-id="18">The choice of sinusoid (rather than learned) lets the model extrapolate to lengths longer than seen in training.</span></p>
+<p><span class="sentence" data-audio="audio/s0035.mp3" data-sentence-id="19">The encoder is six identical layers of [self-attention → feed-forward].</span> <span class="sentence" data-audio="audio/s0037.mp3" data-sentence-id="20">The decoder mirrors it with an added cross-attention sub-layer and masked self-attention so positions can't attend to the future.</span></p>
 <h2>Comparison</h2>
 <table>
 <thead>
 <tr>
-<th><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">Layer Type</span></th>
-<th><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">Complexity per layer</span></th>
-<th><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">Sequential ops</span></th>
-<th><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">Max path length</span></th>
+<th><span class="sentence" data-audio="audio/s0039.mp3" data-sentence-id="21">Layer Type</span></th>
+<th><span class="sentence" data-audio="audio/s0041.mp3" data-sentence-id="22">Complexity per layer</span></th>
+<th><span class="sentence" data-audio="audio/s0043.mp3" data-sentence-id="23">Sequential ops</span></th>
+<th><span class="sentence" data-audio="audio/s0045.mp3" data-sentence-id="24">Max path length</span></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">Recurrent</span></td>
-<td><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">$O(n \cdot d^2)$</span></td>
-<td><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">$O(n)$</span></td>
-<td><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">$O(n)$</span></td>
+<td><span class="sentence" data-audio="audio/s0047.mp3" data-sentence-id="25">Recurrent</span></td>
+<td>$O(n \cdot d^2)$</td>
+<td>$O(n)$</td>
+<td>$O(n)$</td>
 </tr>
 <tr>
-<td><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">Convolutional</span></td>
-<td><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">$O(k \cdot n \cdot d^2)$</span></td>
-<td><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">$O(1)$</span></td>
-<td><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">$O(\log_k n)$</span></td>
+<td><span class="sentence" data-audio="audio/s0049.mp3" data-sentence-id="27">Convolutional</span></td>
+<td>$O(k \cdot n \cdot d^2)$</td>
+<td>$O(1)$</td>
+<td>$O(\log_k n)$</td>
 </tr>
 <tr>
-<td><strong><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">Self-attention</span></strong></td>
-<td><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">$O(n^2 \cdot d)$</span></td>
-<td><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">$O(1)$</span></td>
-<td><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">$O(1)$</span></td>
+<td><strong><span class="sentence" data-audio="audio/s0051.mp3" data-sentence-id="30">Self-attention</span></strong></td>
+<td>$O(n^2 \cdot d)$</td>
+<td>$O(1)$</td>
+<td>$O(1)$</td>
 </tr>
 </tbody>
 </table>
-<p><span class="sentence" data-audio="audio/s0026.mp3" data-sentence-id="13">The trade-off is explicit: self-attention pays $n^2$ in compute but collapses the maximum dependency path between any two positions to $O(1)$, while staying perfectly parallelizable.</span> <span class="sentence" data-audio="audio/s0028.mp3" data-sentence-id="14">For typical sentence lengths ($n &lt; d$), this is cheaper than RNN per layer too.</span></p>
-<p><span class="sentence" data-audio="audio/s0028.mp3" data-sentence-id="14">Against the best 2017 models on WMT 2014 EN→DE: Transformer (big) reaches </span><strong><span class="sentence" data-audio="audio/s0028.mp3" data-sentence-id="14">28.4 BLEU</span></strong><span class="sentence" data-audio="audio/s0028.mp3" data-sentence-id="14">, beating the previous best ensemble by ~2 BLEU, while training in 3.5 days on 8 P100s — a fraction of competitors' cost.</span></p>
+<p><span class="sentence" data-audio="audio/s0053.mp3" data-sentence-id="32">The trade-off is explicit: self-attention pays $n^2$ in compute but collapses the maximum dependency path between any two positions to $O(1)$, while staying perfectly parallelizable.</span> <span class="sentence" data-audio="audio/s0055.mp3" data-sentence-id="33">For typical sentence lengths ($n &lt; d$), this is cheaper than RNN per layer too.</span></p>
+<p><span class="sentence" data-audio="audio/s0057.mp3" data-sentence-id="34">Against the best 2017 models on WMT 2014 EN→DE: Transformer (big) reaches </span><strong><span class="sentence" data-audio="audio/s0057.mp3" data-sentence-id="34">28.4 BLEU</span></strong><span class="sentence" data-audio="audio/s0057.mp3" data-sentence-id="34">, beating the previous best ensemble by ~2 BLEU, while training in 3.5 days on 8 P100s — a fraction of competitors' cost.</span></p>
 <h2>Summary</h2>
-<p><span class="sentence" data-audio="audio/s0028.mp3" data-sentence-id="14">The Transformer's importance was clear in retrospect but not obvious at the time: a clean architectural simplification that turned out to be the right substrate for everything downstream — BERT, GPT, ViT, CLIP, the entire modern foundation-model stack.</span> <span class="sentence" data-audio="audio/s0030.mp3" data-sentence-id="15">The mechanical contribution (scaled dot-product attention + multi-head + positional encoding) is small; the </span><strong><span class="sentence" data-audio="audio/s0030.mp3" data-sentence-id="15">conceptual move</span></strong><span class="sentence" data-audio="audio/s0030.mp3" data-sentence-id="15"> — refusing to keep recurrence as a comfort blanket — is what mattered.</span></p>
-<p><span class="sentence" data-audio="audio/s0030.mp3" data-sentence-id="15">What still surprises on re-reading: how </span><em><span class="sentence" data-audio="audio/s0030.mp3" data-sentence-id="15">little</span></em><span class="sentence" data-audio="audio/s0030.mp3" data-sentence-id="15"> tuning was needed.</span> <span class="sentence" data-audio="audio/s0032.mp3" data-sentence-id="16">Three primitives, a clean residual stack, layer normalization.</span> <span class="sentence" data-audio="audio/s0034.mp3" data-sentence-id="17">Most of the "tricks" are interpretability conveniences, not load-bearing.</span></p>
-<p><span class="sentence" data-audio="audio/s0034.mp3" data-sentence-id="17">Worth holding in mind: every modern attention variant (flash-attention, sliding window, MQA / GQA, rotary positional encoding) is a delta against this 2017 baseline.</span></p>
+<p><span class="sentence" data-audio="audio/s0059.mp3" data-sentence-id="35">The Transformer's importance was clear in retrospect but not obvious at the time: a clean architectural simplification that turned out to be the right substrate for everything downstream — BERT, GPT, ViT, CLIP, the entire modern foundation-model stack.</span> <span class="sentence" data-audio="audio/s0061.mp3" data-sentence-id="36">The mechanical contribution (scaled dot-product attention + multi-head + positional encoding) is small; the </span><strong><span class="sentence" data-audio="audio/s0061.mp3" data-sentence-id="36">conceptual move</span></strong><span class="sentence" data-audio="audio/s0061.mp3" data-sentence-id="36"> — refusing to keep recurrence as a comfort blanket — is what mattered.</span></p>
+<p><span class="sentence" data-audio="audio/s0063.mp3" data-sentence-id="37">What still surprises on re-reading: how </span><em><span class="sentence" data-audio="audio/s0063.mp3" data-sentence-id="37">little</span></em><span class="sentence" data-audio="audio/s0063.mp3" data-sentence-id="37"> tuning was needed.</span> <span class="sentence" data-audio="audio/s0065.mp3" data-sentence-id="38">Three primitives, a clean residual stack, layer normalization.</span> <span class="sentence" data-audio="audio/s0067.mp3" data-sentence-id="39">Most of the "tricks" are interpretability conveniences, not load-bearing.</span></p>
+<p><span class="sentence" data-audio="audio/s0069.mp3" data-sentence-id="40">Worth holding in mind: every modern attention variant (flash-attention, sliding window, MQA / GQA, rotary positional encoding) is a delta against this 2017 baseline.</span></p>
 
   </div>
   <div class="body" data-lang="zh" hidden>
