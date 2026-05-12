@@ -1,0 +1,25 @@
+reports/2501.13958v3/report.en.md
+  s_f16df956489b28::t_26fba488d23ccc 1-60
+reports/2501.13958v3/report.zh.md
+  s_f16df956489b28::t_cd775af206abb5 1-60
+reports/2505.07891v2/report.zh.md
+  s_f16df956489b28::t_a44ece66a0425c 1,5,7,11-13,15,17,19,21,23,25,27,29,33-45,47,49,53,55,57
+reports/2505.07891v2/report.en.md
+  s_f16df956489b28::t_f66efea1a164b6 1,5,7,11-13,15,17,19,21,23,25,27,29,33-45,47,49,53,55,57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "61c6007efbb3435221593fee034a9961734f8851",
+  "prompts": {},
+  "sessions": {
+    "s_f16df956489b28": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7af84cbc-2d77-4f8d-abb6-02d07898a70e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "hsiaosiyuan0 <hsiaosiyuan0@outlook.com>"
+    }
+  }
+}
