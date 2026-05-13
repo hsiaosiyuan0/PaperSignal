@@ -1,0 +1,23 @@
+reports/2401.18059v1/report.en.md
+  s_529c2280966acf::t_0fbf713b83e218 1-79
+reports/2401.18059v1/report.zh.md
+  s_529c2280966acf::t_900df31c91d56c 1-79
+reports/index.html
+  s_529c2280966acf::t_747339cb8dac3e 199,203,205
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "e4880974cd753f73df19bd12f7262311d8196e85",
+  "prompts": {},
+  "sessions": {
+    "s_529c2280966acf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02ad1584-6e64-406b-b913-df5498632329",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "hsiaosiyuan0 <hsiaosiyuan0@outlook.com>"
+    }
+  }
+}
