@@ -1,0 +1,19 @@
+src/paperread/cli.py
+  s_529c2280966acf::t_10732d807705db 603
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "0fb1f84e2f6f67f9975605cecd6563c0ead46f54",
+  "prompts": {},
+  "sessions": {
+    "s_529c2280966acf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02ad1584-6e64-406b-b913-df5498632329",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "hsiaosiyuan0 <hsiaosiyuan0@outlook.com>"
+    }
+  }
+}
