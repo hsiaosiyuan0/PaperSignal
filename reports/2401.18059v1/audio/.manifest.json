@@ -1,0 +1,635 @@
+{
+  "voice": "en-US-AvaMultilingualNeural",
+  "sentences": [
+    {
+      "index": 0,
+      "text": "RAPTOR (Stanford, Christopher Manning's group, ICLR 2024) was published a few months before Microsoft GraphRAG and pre-figures the same diagnosis: standard retrieval-augmented LMs fetch a handful of short, contiguous chunks, which is a structural mismatch for questions that require integrating information across a long document.",
+      "hash": "dcea00da0cbba01c",
+      "filename": "s0001.mp3"
+    },
+    {
+      "index": 1,
+      "text": "The paper's running example is the Cinderella fairy tale and the question \"How did Cinderella reach her happy ending?\" — no top-k of 100-token snippets contains the answer; you need the arc of the story.",
+      "hash": "ce7615db5a4e0700",
+      "filename": "s0003.mp3"
+    },
+    {
+      "index": 2,
+      "text": "The contribution is the first widely-adopted answer to \"what would multi-level retrieval look like\": recursively cluster text chunks, summarize each cluster, recurse on the summaries, until you can't cluster anymore.",
+      "hash": "826baf2ba38daa42",
+      "filename": "s0005.mp3"
+    },
+    {
+      "index": 3,
+      "text": "The output is a tree where leaves are the original text and every higher layer is an LLM-generated abstraction of its children.",
+      "hash": "3ce6d4e8abd6957c",
+      "filename": "s0007.mp3"
+    },
+    {
+      "index": 4,
+      "text": "At query time you retrieve from all layers at once.",
+      "hash": "5ae17c5518e3d8f2",
+      "filename": "s0009.mp3"
+    },
+    {
+      "index": 5,
+      "text": "Read alongside the rest of the GraphRAG arc, RAPTOR is the tree-based predecessor: the hierarchical-summary idea that GraphRAG later transposes onto a graph (community summaries instead of cluster summaries), and that LightRAG eventually argues you can drop entirely.",
+      "hash": "7dc44aa5994b643f",
+      "filename": "s0011.mp3"
+    },
+    {
+      "index": 6,
+      "text": "Tree construction is the core idea.",
+      "hash": "86c4b35eaf410185",
+      "filename": "s0013.mp3"
+    },
+    {
+      "index": 7,
+      "text": "Three nested loops over the corpus, repeated until convergence:",
+      "hash": "7a760dd6b3a44d6d",
+      "filename": "s0015.mp3"
+    },
+    {
+      "index": 8,
+      "text": "❶ Chunk + embed.",
+      "hash": "3d008c0c04764367",
+      "filename": "s0017.mp3"
+    },
+    {
+      "index": 9,
+      "text": "Split the corpus into ~100-token contiguous chunks (sentences kept whole — if a sentence would push past 100 tokens, the whole sentence moves to the next chunk).",
+      "hash": "77583b726ab0eb1a",
+      "filename": "s0019.mp3"
+    },
+    {
+      "index": 10,
+      "text": "Embed each with SBERT ().",
+      "hash": "c8ce8959dc57b477",
+      "filename": "s0021.mp3"
+    },
+    {
+      "index": 11,
+      "text": "These become the leaf layer.",
+      "hash": "e5885f1cb6b04664",
+      "filename": "s0023.mp3"
+    },
+    {
+      "index": 12,
+      "text": "❷ Cluster.",
+      "hash": "6f00526a980bd8ed",
+      "filename": "s0025.mp3"
+    },
+    {
+      "index": 13,
+      "text": "Soft clustering with Gaussian Mixture Models on the embeddings.",
+      "hash": "6c623c8a5d40aba9",
+      "filename": "s0027.mp3"
+    },
+    {
+      "index": 14,
+      "text": "Two implementation choices matter:",
+      "hash": "6bafc91130248979",
+      "filename": "s0029.mp3"
+    },
+    {
+      "index": 15,
+      "text": "UMAP for dimensionality reduction before GMM, because high-dim Euclidean distance degrades.",
+      "hash": "4ced888b751d04a4",
+      "filename": "s0031.mp3"
+    },
+    {
+      "index": 16,
+      "text": "Vary UMAP's to do two-pass clustering — first global clusters, then local clustering inside each global cluster.",
+      "hash": "29d9c8b7c209a742",
+      "filename": "s0033.mp3"
+    },
+    {
+      "index": 17,
+      "text": "BIC (Bayesian Information Criterion) to pick the cluster count automatically.",
+      "hash": "94ecda01ebd33c9b",
+      "filename": "s0035.mp3"
+    },
+    {
+      "index": 18,
+      "text": "EM solves the resulting GMM.",
+      "hash": "49d6be21486bec2c",
+      "filename": "s0037.mp3"
+    },
+    {
+      "index": 19,
+      "text": "Soft clustering matters: a chunk can belong to multiple clusters, which matches the reality that a paragraph can carry several topics.",
+      "hash": "8b1ff8c4ae396214",
+      "filename": "s0039.mp3"
+    },
+    {
+      "index": 20,
+      "text": "If a cluster's combined context exceeds the summarization model's token limit, recurse with a tighter UMAP locally.",
+      "hash": "b950003f17d38004",
+      "filename": "s0041.mp3"
+    },
+    {
+      "index": 21,
+      "text": "❸ Summarize and recurse.",
+      "hash": "ad1937ee45abdfdd",
+      "filename": "s0043.mp3"
+    },
+    {
+      "index": 22,
+      "text": "Each cluster's chunks are sent to , which produces a single text summary.",
+      "hash": "e440867301a237ca",
+      "filename": "s0045.mp3"
+    },
+    {
+      "index": 23,
+      "text": "That summary becomes a new node, embedded by SBERT, and joins the next layer up.",
+      "hash": "cf6e313f16121573",
+      "filename": "s0047.mp3"
+    },
+    {
+      "index": 24,
+      "text": "Repeat the cluster-and-summarize cycle on the new layer.",
+      "hash": "7a082a83fb28891d",
+      "filename": "s0049.mp3"
+    },
+    {
+      "index": 25,
+      "text": "Stop when clustering becomes infeasible.",
+      "hash": "f7ba047c52f182e8",
+      "filename": "s0051.mp3"
+    },
+    {
+      "index": 26,
+      "text": "A focused annotation study found ~4% of summaries contain minor hallucinations that do not propagate to parent nodes and have no measurable downstream effect — useful empirical evidence for \"summarize-then-summarize\" being safer than feared.",
+      "hash": "875feeb78bb4f1f7",
+      "filename": "s0053.mp3"
+    },
+    {
+      "index": 27,
+      "text": "Two querying strategies sit on top of the tree.",
+      "hash": "51a2036b24a64ead",
+      "filename": "s0055.mp3"
+    },
+    {
+      "index": 28,
+      "text": "They are evaluated head-to-head, and the simpler one wins:",
+      "hash": "debef7c353228ed4",
+      "filename": "s0057.mp3"
+    },
+    {
+      "index": 29,
+      "text": "Tree traversal.",
+      "hash": "d56ab7b391927331",
+      "filename": "s0059.mp3"
+    },
+    {
+      "index": 30,
+      "text": "Start at the root.",
+      "hash": "8ee6af5feef98b62",
+      "filename": "s0061.mp3"
+    },
+    {
+      "index": 31,
+      "text": "Take top-k by cosine similarity.",
+      "hash": "d02c6b7511aa33db",
+      "filename": "s0063.mp3"
+    },
+    {
+      "index": 32,
+      "text": "Descend into those nodes' children, top-k again.",
+      "hash": "45959f04f8335eb0",
+      "filename": "s0065.mp3"
+    },
+    {
+      "index": 33,
+      "text": "Repeat for layers.",
+      "hash": "5d594d3a3ff34b05",
+      "filename": "s0067.mp3"
+    },
+    {
+      "index": 34,
+      "text": "Concatenate.",
+      "hash": "f198e380c7f3eaf1",
+      "filename": "s0069.mp3"
+    },
+    {
+      "index": 35,
+      "text": "Collapsed tree.",
+      "hash": "987033854f5d6482",
+      "filename": "s0071.mp3"
+    },
+    {
+      "index": 36,
+      "text": "Flatten the entire tree into one bag of nodes.",
+      "hash": "64c9ff59b5114e6e",
+      "filename": "s0073.mp3"
+    },
+    {
+      "index": 37,
+      "text": "Cosine-rank against the query.",
+      "hash": "b3a2b2708ba997e1",
+      "filename": "s0075.mp3"
+    },
+    {
+      "index": 38,
+      "text": "Take top nodes until you hit a token budget (they use 2000 tokens, ≈ top-20).",
+      "hash": "f5343ed6f0aed0f0",
+      "filename": "s0077.mp3"
+    },
+    {
+      "index": 39,
+      "text": "The collapsed-tree approach consistently wins.",
+      "hash": "4adaba6c9016f20a",
+      "filename": "s0079.mp3"
+    },
+    {
+      "index": 40,
+      "text": "The reason the authors give is structural: tree traversal has a fixed ratio of nodes-per-layer in its result, so the abstract/detail mix is decided by the topology rather than by the question.",
+      "hash": "c757f0310fe04e94",
+      "filename": "s0081.mp3"
+    },
+    {
+      "index": 41,
+      "text": "Collapsed tree lets the question's level of granularity decide which layer's nodes get retrieved.",
+      "hash": "166df687f39270a2",
+      "filename": "s0083.mp3"
+    },
+    {
+      "index": 42,
+      "text": "Three datasets, picked specifically to stress long-document reasoning: NarrativeQA (books and movie scripts, full text), QASPER (questions over full NLP papers), QuALITY (multiple-choice over ~5,000-token passages, plus a HARD subset where humans fail under time pressure).",
+      "hash": "5cfecb054c811520",
+      "filename": "s0085.mp3"
+    },
+    {
+      "index": 43,
+      "text": "Controlled retrieval-only ablation (UnifiedQA-3B as reader, SBERT/BM25/DPR ± RAPTOR):",
+      "hash": "8647bf8791751a3f",
+      "filename": "s0087.mp3"
+    },
+    {
+      "index": 44,
+      "text": "Reader: UnifiedQA-3B",
+      "hash": "87beb0a230be0fdf",
+      "filename": "s0089.mp3"
+    },
+    {
+      "index": 45,
+      "text": "QuALITY Acc",
+      "hash": "610d99823438fe27",
+      "filename": "s0091.mp3"
+    },
+    {
+      "index": 46,
+      "text": "QASPER F1",
+      "hash": "a354c26a3f33979b",
+      "filename": "s0093.mp3"
+    },
+    {
+      "index": 47,
+      "text": "SBERT + RAPTOR",
+      "hash": "f82fe2842dc51dd7",
+      "filename": "s0095.mp3"
+    },
+    {
+      "index": 48,
+      "text": "56.6%",
+      "hash": "f34d25f529800ac2",
+      "filename": "s0097.mp3"
+    },
+    {
+      "index": 49,
+      "text": "36.7%",
+      "hash": "5d72b3d2862c17c5",
+      "filename": "s0099.mp3"
+    },
+    {
+      "index": 50,
+      "text": "SBERT alone",
+      "hash": "fbfb7a7e8fe14bdf",
+      "filename": "s0101.mp3"
+    },
+    {
+      "index": 51,
+      "text": "54.9%",
+      "hash": "c08ce43f6682364a",
+      "filename": "s0103.mp3"
+    },
+    {
+      "index": 52,
+      "text": "36.2%",
+      "hash": "36fe0c90f1ba2d1b",
+      "filename": "s0105.mp3"
+    },
+    {
+      "index": 53,
+      "text": "BM25 + RAPTOR",
+      "hash": "92bb915c010e8822",
+      "filename": "s0107.mp3"
+    },
+    {
+      "index": 54,
+      "text": "52.1%",
+      "hash": "a4ada2e02ee0b192",
+      "filename": "s0109.mp3"
+    },
+    {
+      "index": 55,
+      "text": "27.0%",
+      "hash": "f181dec1867e4e2c",
+      "filename": "s0111.mp3"
+    },
+    {
+      "index": 56,
+      "text": "BM25 alone",
+      "hash": "8e00425385aef560",
+      "filename": "s0113.mp3"
+    },
+    {
+      "index": 57,
+      "text": "49.9%",
+      "hash": "5347397c81a3077d",
+      "filename": "s0115.mp3"
+    },
+    {
+      "index": 58,
+      "text": "26.5%",
+      "hash": "18d9eb4930ca8fe4",
+      "filename": "s0117.mp3"
+    },
+    {
+      "index": 59,
+      "text": "DPR + RAPTOR",
+      "hash": "a6e4efd941108e6d",
+      "filename": "s0119.mp3"
+    },
+    {
+      "index": 60,
+      "text": "54.7%",
+      "hash": "5a52d75a52db909d",
+      "filename": "s0121.mp3"
+    },
+    {
+      "index": 61,
+      "text": "32.2%",
+      "hash": "a9ad6a4acc711fe3",
+      "filename": "s0123.mp3"
+    },
+    {
+      "index": 62,
+      "text": "DPR alone",
+      "hash": "ea638d7aa7af266b",
+      "filename": "s0125.mp3"
+    },
+    {
+      "index": 63,
+      "text": "53.1%",
+      "hash": "6f07a981b36ea4cf",
+      "filename": "s0127.mp3"
+    },
+    {
+      "index": 64,
+      "text": "31.7%",
+      "hash": "70d49a4e6a82d1d4",
+      "filename": "s0129.mp3"
+    },
+    {
+      "index": 65,
+      "text": "Adding the RAPTOR tree on top of any retriever improves it — the gain is consistent, modest, retriever-agnostic.",
+      "hash": "23fb22c1bd692c9e",
+      "filename": "s0131.mp3"
+    },
+    {
+      "index": 66,
+      "text": "State-of-the-art when paired with GPT-4:",
+      "hash": "1d2f67579ba2f361",
+      "filename": "s0133.mp3"
+    },
+    {
+      "index": 67,
+      "text": "Dataset",
+      "hash": "1052689464e38f50",
+      "filename": "s0135.mp3"
+    },
+    {
+      "index": 68,
+      "text": "Prev.",
+      "hash": "2f4f348fe2ab87d6",
+      "filename": "s0137.mp3"
+    },
+    {
+      "index": 69,
+      "text": "SOTA",
+      "hash": "a56e1d4780a9477c",
+      "filename": "s0139.mp3"
+    },
+    {
+      "index": 70,
+      "text": "RAPTOR + GPT-4",
+      "hash": "d53517918a6ad75e",
+      "filename": "s0141.mp3"
+    },
+    {
+      "index": 71,
+      "text": "QASPER (F1)",
+      "hash": "da5ddb58a480580d",
+      "filename": "s0143.mp3"
+    },
+    {
+      "index": 72,
+      "text": "CoLT5-XL 53.9%",
+      "hash": "b96fa134447e0b47",
+      "filename": "s0145.mp3"
+    },
+    {
+      "index": 73,
+      "text": "55.7%",
+      "hash": "4dc27661c12673ba",
+      "filename": "s0147.mp3"
+    },
+    {
+      "index": 74,
+      "text": "QuALITY (Acc)",
+      "hash": "005c478c30a4fede",
+      "filename": "s0149.mp3"
+    },
+    {
+      "index": 75,
+      "text": "CoLISA 62.3%",
+      "hash": "d17d5236a8c43d19",
+      "filename": "s0151.mp3"
+    },
+    {
+      "index": 76,
+      "text": "82.6%",
+      "hash": "f917fc94a05fb058",
+      "filename": "s0153.mp3"
+    },
+    {
+      "index": 77,
+      "text": "+20.3",
+      "hash": "d7410a5aa41cea79",
+      "filename": "s0155.mp3"
+    },
+    {
+      "index": 78,
+      "text": "QuALITY-HARD",
+      "hash": "670dfef542233978",
+      "filename": "s0157.mp3"
+    },
+    {
+      "index": 79,
+      "text": "CoLISA 54.7%",
+      "hash": "b572e22378a781f7",
+      "filename": "s0159.mp3"
+    },
+    {
+      "index": 80,
+      "text": "76.2%",
+      "hash": "d2fd5acba2bf1915",
+      "filename": "s0161.mp3"
+    },
+    {
+      "index": 81,
+      "text": "+21.5",
+      "hash": "5a936b9dc02f8ef7",
+      "filename": "s0163.mp3"
+    },
+    {
+      "index": 82,
+      "text": "NarrativeQA (METEOR)",
+      "hash": "d39939029913a4e7",
+      "filename": "s0165.mp3"
+    },
+    {
+      "index": 83,
+      "text": "Izacard&Grave 11.1",
+      "hash": "861a80f29f3a630c",
+      "filename": "s0167.mp3"
+    },
+    {
+      "index": 84,
+      "text": "19.1 (w/ UnifiedQA)",
+      "hash": "939650f0ab3568ed",
+      "filename": "s0169.mp3"
+    },
+    {
+      "index": 85,
+      "text": "The QuALITY result is the headline — a 20-point absolute jump on a multi-step-reasoning multiple-choice benchmark, and 21.5 points on the human-hard subset.",
+      "hash": "8750f83e31fe1120",
+      "filename": "s0171.mp3"
+    },
+    {
+      "index": 86,
+      "text": "This is the result that put RAPTOR on every subsequent RAG-architecture paper's related-work section.",
+      "hash": "d3b689241e8cf708",
+      "filename": "s0173.mp3"
+    },
+    {
+      "index": 87,
+      "text": "The tree-layer ablation is what makes the methodology defensible (Table 8 in the paper).",
+      "hash": "bf7a5766c8bbc980",
+      "filename": "s0175.mp3"
+    },
+    {
+      "index": 88,
+      "text": "On a single QuALITY story, querying only leaf nodes gives 57.9%; querying 2 layers from layer 2 gives 63.15%; querying all 3 layers from layer 2 gives 73.68%.",
+      "hash": "8bd16758a90411da",
+      "filename": "s0177.mp3"
+    },
+    {
+      "index": 89,
+      "text": "The full tree is doing real work; it isn't just a clever way of duplicating leaf information.",
+      "hash": "749e857bc0e23d09",
+      "filename": "s0179.mp3"
+    },
+    {
+      "index": 90,
+      "text": "RAPTOR is the cleanest statement of one specific idea: retrieval should be able to choose the level of abstraction.",
+      "hash": "1167ce69c5e6a25b",
+      "filename": "s0181.mp3"
+    },
+    {
+      "index": 91,
+      "text": "The mechanism — recursive cluster+summarize over text chunks — is mechanically simple, but the design choices are deliberate:",
+      "hash": "21f837a2c1e9504e",
+      "filename": "s0183.mp3"
+    },
+    {
+      "index": 92,
+      "text": "Soft clustering (a chunk can be in multiple summaries) — handles the messiness of real text",
+      "hash": "8a61f5698caa687b",
+      "filename": "s0185.mp3"
+    },
+    {
+      "index": 93,
+      "text": "GMM + UMAP + BIC — a defensible probabilistic stack, not magic numbers",
+      "hash": "00d247d41669a978",
+      "filename": "s0187.mp3"
+    },
+    {
+      "index": 94,
+      "text": "Collapsed-tree retrieval — let the question decide the layer mix, don't preordain it",
+      "hash": "f9825ea11a6347a3",
+      "filename": "s0189.mp3"
+    },
+    {
+      "index": 95,
+      "text": "The empirical case is strong: +20 points on QuALITY against the previous SOTA is the kind of jump that gets a paper into ICLR and stays cited.",
+      "hash": "ee2f0594e2792ca7",
+      "filename": "s0191.mp3"
+    },
+    {
+      "index": 96,
+      "text": "Where the paper points forward: RAPTOR builds a hierarchy on text, but the hierarchy is a tree over clusters of chunks.",
+      "hash": "6854449296ebf0e4",
+      "filename": "s0193.mp3"
+    },
+    {
+      "index": 97,
+      "text": "The natural next move is to ask: what if the lower level were an entity-relation graph rather than a flat embedding space?",
+      "hash": "3a3cc05979f65f80",
+      "filename": "s0195.mp3"
+    },
+    {
+      "index": 98,
+      "text": "That move — replacing the chunk-cluster tree with an LLM-extracted knowledge graph and community-detection-based hierarchy — is exactly Microsoft's GraphRAG, three months later.",
+      "hash": "c79f5ccd44872f34",
+      "filename": "s0197.mp3"
+    },
+    {
+      "index": 99,
+      "text": "And once you have that graph, the next argument (LightRAG, six months after that) is that you can keep the graph and drop the community summaries entirely.",
+      "hash": "07e7dfaf1455ea17",
+      "filename": "s0199.mp3"
+    },
+    {
+      "index": 100,
+      "text": "So in the three-paper arc, RAPTOR is the \"summarize-the-corpus\" pole, GraphRAG is the \"graph + summaries\" middle, and LightRAG is the \"only the graph\" pole.",
+      "hash": "ff0b64856ba7d0fa",
+      "filename": "s0201.mp3"
+    },
+    {
+      "index": 101,
+      "text": "Reading them in order makes it clear that the field's question for 2024 was not \"do we need hierarchy?\" but \"how much of the hierarchy is the LLM-generated summarization layer doing the work, vs the structural layer underneath?\"",
+      "hash": "42fbcb0d7a2d61e5",
+      "filename": "s0203.mp3"
+    },
+    {
+      "index": 102,
+      "text": "RAPTOR's evidence — that even tree-organized recursive summaries help, but the full tree helps more than any single layer — is the empirical baseline that everything after has to beat.",
+      "hash": "6884bea1c35e5a4c",
+      "filename": "s0205.mp3"
+    },
+    {
+      "index": 103,
+      "text": "Open source at github.com/parthsarthi03/raptor.",
+      "hash": "9611c14c3aeb527d",
+      "filename": "s0207.mp3"
+    },
+    {
+      "index": 104,
+      "text": "Stanford NLP, Manning group; expect clean code and reproducible experiments.",
+      "hash": "4da38aa4c82917e5",
+      "filename": "s0209.mp3"
+    }
+  ]
+}

@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval — paperread</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,30..100;1,9..144,300..700,30..100&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<style>
+:root {
+  --bone: #F4EFE6;
+  --bone-soft: #FBF7EE;
+  --graphite: #1F1F1E;
+  --graphite-soft: #6A6A66;
+  --graphite-fade: #B7B5AE;
+  --vermillion: #C9482A;
+  --vermillion-soft: rgba(201, 72, 42, 0.08);
+  --hairline: rgba(31, 31, 30, 0.14);
+  --serif: "Fraunces", "Iowan Old Style", "Hoefler Text", Georgia, serif;
+  --serif-cn: "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", serif;
+  --mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+  --reading-width: 46rem;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--bone);
+  color: var(--graphite);
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 14, "SOFT" 50;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+article {
+  max-width: var(--reading-width);
+  margin: 0 auto;
+  padding: 4.5rem 1.5rem 2rem;
+  position: relative;
+}
+
+.lang-switch {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 0.25rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.lang-switch button {
+  border: 1px solid var(--hairline);
+  background: transparent;
+  color: var(--graphite-soft);
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+.lang-switch button:hover { color: var(--vermillion); }
+.lang-switch button.active {
+  background: var(--graphite);
+  color: var(--bone);
+  border-color: var(--graphite);
+}
+
+.brand {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--graphite-soft);
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+.brand .dot { color: var(--vermillion); }
+.brand-rule { border: none; border-top: 1px solid var(--hairline); margin: 0 0 3rem; }
+
+.meta {
+  display: flex;
+  gap: 1.5rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--graphite-soft);
+  margin-bottom: 2rem;
+}
+.meta .id {
+  color: var(--vermillion);
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+h1.title {
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 130, "SOFT" 35;
+  font-style: italic;
+  font-weight: 350;
+  font-size: clamp(2.1rem, 5vw, 3.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.018em;
+  margin: 0 0 1.75rem;
+  color: var(--graphite);
+  text-wrap: balance;
+}
+
+.authors {
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 14, "wght" 500;
+  font-size: 0.78rem;
+  font-feature-settings: "smcp" on, "c2sc" on;
+  letter-spacing: 0.08em;
+  color: var(--graphite-soft);
+  margin: 0 0 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--hairline);
+  text-wrap: pretty;
+}
+
+.body { counter-reset: section; }
+.body[data-lang="zh"] { font-family: var(--serif-cn); }
+.body[data-lang="zh"] h2, .body[data-lang="zh"] h3 { font-family: var(--serif-cn); }
+
+.body h1 { display: none; }
+
+.body h2 {
+  counter-increment: section;
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 36, "wght" 500;
+  font-size: 1.55rem;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 3.5rem 0 1.1rem;
+  color: var(--graphite);
+}
+.body h2::before {
+  content: counter(section, upper-roman);
+  display: inline;
+  color: var(--vermillion);
+  font-family: var(--mono);
+  font-size: 0.62em;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  margin-right: 0.85em;
+  vertical-align: 0.2em;
+}
+
+.body h3 {
+  font-family: var(--serif);
+  font-variation-settings: "opsz" 24, "wght" 500;
+  font-style: italic;
+  font-size: 1.18rem;
+  margin: 2.5rem 0 0.9rem;
+}
+
+.body p {
+  margin: 0 0 1.1em;
+  font-variant-numeric: lining-nums proportional-nums;
+  text-wrap: pretty;
+  hanging-punctuation: first;
+}
+
+.body a {
+  color: var(--vermillion);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(201, 72, 42, 0.35);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.body a:hover { border-bottom-color: var(--vermillion); background: var(--vermillion-soft); }
+
+.body strong { font-weight: 600; }
+.body em { font-style: italic; }
+
+.body ul, .body ol { padding-left: 1.5rem; margin: 0 0 1.2em; }
+.body li { margin-bottom: 0.35em; }
+.body li::marker { color: var(--vermillion); font-family: var(--mono); }
+
+.body code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  padding: 0.1em 0.35em;
+  background: var(--vermillion-soft);
+  color: var(--graphite);
+  border-radius: 2px;
+}
+
+.body pre {
+  font-family: var(--mono);
+  font-size: 0.82em;
+  line-height: 1.6;
+  background: rgba(31, 31, 30, 0.04);
+  border-left: 2px solid var(--vermillion);
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1.6rem 0;
+}
+.body pre code { background: none; padding: 0; border-radius: 0; }
+
+.body blockquote {
+  font-style: italic;
+  font-variation-settings: "opsz" 18;
+  margin: 1.75rem 0;
+  padding: 0 1.25rem;
+  border-left: 2px solid var(--vermillion);
+  color: var(--graphite-soft);
+}
+
+.body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.75rem 0;
+  font-size: 0.92em;
+  font-variant-numeric: tabular-nums;
+}
+.body th, .body td {
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--hairline);
+}
+.body th:first-child, .body td:first-child { padding-left: 0; }
+.body th:last-child, .body td:last-child { padding-right: 0; }
+.body thead th {
+  border-bottom: 2px solid var(--graphite);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  font-family: var(--mono);
+}
+
+.body hr { border: none; border-top: 1px solid var(--hairline); margin: 2.5rem 0; }
+
+/* KaTeX */
+.body .katex-display {
+  margin: 1.75em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25em 0;
+}
+.body .katex { font-size: 1em; color: var(--graphite); }
+.body .katex-display > .katex { display: block; text-align: center; }
+
+/* Sentence audio */
+.body[data-lang="en"] .sentence {
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+  border-radius: 1px;
+  padding: 0 0.05em;
+}
+.body[data-lang="en"] .sentence.hover,
+.body[data-lang="en"] .sentence:hover {
+  background: var(--vermillion-soft);
+}
+.body[data-lang="en"] .sentence.playing {
+  background: var(--vermillion);
+  color: var(--bone);
+}
+
+footer {
+  max-width: var(--reading-width);
+  margin: 5rem auto 3rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--graphite-soft);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+footer a { color: var(--vermillion); text-decoration: none; }
+
+@media (max-width: 640px) {
+  article { padding: 3rem 1.25rem 1.5rem; }
+  .lang-switch { top: 1rem; right: 1rem; }
+  .brand { font-size: 0.62rem; gap: 1rem; }
+  .meta { gap: 0.9rem 1.2rem; font-size: 0.68rem; }
+  h1.title { font-size: 1.95rem; }
+  .authors { font-size: 0.72rem; }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bone: #1B1A18;
+    --bone-soft: #232220;
+    --graphite: #ECE5D6;
+    --graphite-soft: #948B7B;
+    --graphite-fade: #524C42;
+    --vermillion: #E36246;
+    --vermillion-soft: rgba(227, 98, 70, 0.10);
+    --hairline: rgba(236, 229, 214, 0.16);
+  }
+}
+
+@media print {
+  body { background: white; color: black; }
+  .lang-switch { display: none; }
+  article { padding: 1in 0.75in; }
+  .brand, footer { color: #555; }
+  .body[hidden] { display: none !important; }
+}
+</style>
+</head>
+<body>
+<article>
+  <div class="lang-switch" role="tablist" aria-label="Language"><button class="active" data-lang="en" aria-selected="true">EN</button><button data-lang="zh" aria-selected="false">中</button></div>
+  <div class="brand">
+    <span>Paperread</span>
+    <span class="dot">·</span>
+    <span>Research Brief</span>
+    <span class="dot">·</span>
+    <span>2026-05-13</span>
+  </div>
+  <hr class="brand-rule">
+  <div class="meta">
+    <span class="id">arXiv / 2401.18059v1</span>
+    <span>cs.CL</span>
+    <span>Published 2024-01-31</span>
+  </div>
+  <h1 class="title">RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval</h1>
+  <p class="authors">Parth Sarthi · Salman Abdullah · Aditi Tuli · Shubh Khanna · Anna Goldie · Christopher D. Manning</p>
+  <div class="body" data-lang="en">
+<h1>RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval — Research Brief</h1>
+<h2>Background</h2>
+<p><span class="sentence" data-audio="audio/s0001.mp3" data-sentence-id="0">RAPTOR (Stanford, Christopher Manning's group, ICLR 2024) was published a few months before Microsoft GraphRAG and pre-figures the same diagnosis: standard retrieval-augmented LMs fetch a handful of short, contiguous chunks, which is a structural mismatch for questions that require integrating information across a long document.</span> <span class="sentence" data-audio="audio/s0003.mp3" data-sentence-id="1">The paper's running example is the Cinderella fairy tale and the question </span><em><span class="sentence" data-audio="audio/s0003.mp3" data-sentence-id="1">"How did Cinderella reach her happy ending?"</span></em><span class="sentence" data-audio="audio/s0003.mp3" data-sentence-id="1"> — no top-k of 100-token snippets contains the answer; you need the </span><em><span class="sentence" data-audio="audio/s0003.mp3" data-sentence-id="1">arc</span></em><span class="sentence" data-audio="audio/s0003.mp3" data-sentence-id="1"> of the story.</span></p>
+<p><span class="sentence" data-audio="audio/s0005.mp3" data-sentence-id="2">The contribution is the first widely-adopted answer to "what would multi-level retrieval look like": recursively cluster text chunks, summarize each cluster, recurse on the summaries, until you can't cluster anymore.</span> <span class="sentence" data-audio="audio/s0007.mp3" data-sentence-id="3">The output is a tree where leaves are the original text and every higher layer is an LLM-generated abstraction of its children.</span> <span class="sentence" data-audio="audio/s0009.mp3" data-sentence-id="4">At query time you retrieve from </span><em><span class="sentence" data-audio="audio/s0009.mp3" data-sentence-id="4">all layers at once</span></em><span class="sentence" data-audio="audio/s0009.mp3" data-sentence-id="4">.</span></p>
+<p><span class="sentence" data-audio="audio/s0011.mp3" data-sentence-id="5">Read alongside the rest of the GraphRAG arc, RAPTOR is the </span><strong><span class="sentence" data-audio="audio/s0011.mp3" data-sentence-id="5">tree-based predecessor</span></strong><span class="sentence" data-audio="audio/s0011.mp3" data-sentence-id="5">: the hierarchical-summary idea that GraphRAG later transposes onto a graph (community summaries instead of cluster summaries), and that LightRAG eventually argues you can drop entirely.</span></p>
+<h2>Approach</h2>
+<p><strong><span class="sentence" data-audio="audio/s0013.mp3" data-sentence-id="6">Tree construction is the core idea.</span></strong> <span class="sentence" data-audio="audio/s0015.mp3" data-sentence-id="7">Three nested loops over the corpus, repeated until convergence:</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0017.mp3" data-sentence-id="8">❶ Chunk + embed.</span></strong> <span class="sentence" data-audio="audio/s0019.mp3" data-sentence-id="9">Split the corpus into ~100-token contiguous chunks (sentences kept whole — if a sentence would push past 100 tokens, the whole sentence moves to the next chunk).</span> <span class="sentence" data-audio="audio/s0021.mp3" data-sentence-id="10">Embed each with SBERT (</span><code>multi-qa-mpnet-base-cos-v1</code><span class="sentence" data-audio="audio/s0021.mp3" data-sentence-id="10">).</span> <span class="sentence" data-audio="audio/s0023.mp3" data-sentence-id="11">These become the </span><strong><span class="sentence" data-audio="audio/s0023.mp3" data-sentence-id="11">leaf layer</span></strong><span class="sentence" data-audio="audio/s0023.mp3" data-sentence-id="11">.</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0025.mp3" data-sentence-id="12">❷ Cluster.</span></strong> <span class="sentence" data-audio="audio/s0027.mp3" data-sentence-id="13">Soft clustering with Gaussian Mixture Models on the embeddings.</span> <span class="sentence" data-audio="audio/s0029.mp3" data-sentence-id="14">Two implementation choices matter:</span></p>
+<ul>
+<li><strong><span class="sentence" data-audio="audio/s0031.mp3" data-sentence-id="15">UMAP</span></strong><span class="sentence" data-audio="audio/s0031.mp3" data-sentence-id="15"> for dimensionality reduction before GMM, because high-dim Euclidean distance degrades.</span> <span class="sentence" data-audio="audio/s0033.mp3" data-sentence-id="16">Vary UMAP's </span><code>n_neighbors</code><span class="sentence" data-audio="audio/s0033.mp3" data-sentence-id="16"> to do </span><em><span class="sentence" data-audio="audio/s0033.mp3" data-sentence-id="16">two-pass</span></em><span class="sentence" data-audio="audio/s0033.mp3" data-sentence-id="16"> clustering — first global clusters, then local clustering inside each global cluster.</span></li>
+<li><strong><span class="sentence" data-audio="audio/s0035.mp3" data-sentence-id="17">BIC</span></strong><span class="sentence" data-audio="audio/s0035.mp3" data-sentence-id="17"> (Bayesian Information Criterion) to pick the cluster count automatically.</span> <span class="sentence" data-audio="audio/s0037.mp3" data-sentence-id="18">EM solves the resulting GMM.</span></li>
+</ul>
+<p><span class="sentence" data-audio="audio/s0039.mp3" data-sentence-id="19">Soft clustering matters: a chunk can belong to multiple clusters, which matches the reality that a paragraph can carry several topics.</span> <span class="sentence" data-audio="audio/s0041.mp3" data-sentence-id="20">If a cluster's combined context exceeds the summarization model's token limit, recurse with a tighter UMAP locally.</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0043.mp3" data-sentence-id="21">❸ Summarize and recurse.</span></strong> <span class="sentence" data-audio="audio/s0045.mp3" data-sentence-id="22">Each cluster's chunks are sent to </span><code>gpt-3.5-turbo</code><span class="sentence" data-audio="audio/s0045.mp3" data-sentence-id="22">, which produces a single text summary.</span> <span class="sentence" data-audio="audio/s0047.mp3" data-sentence-id="23">That summary becomes a new node, embedded by SBERT, and joins the next layer up.</span> <span class="sentence" data-audio="audio/s0049.mp3" data-sentence-id="24">Repeat the cluster-and-summarize cycle on the new layer.</span> <span class="sentence" data-audio="audio/s0051.mp3" data-sentence-id="25">Stop when clustering becomes infeasible.</span></p>
+<p><span class="sentence" data-audio="audio/s0053.mp3" data-sentence-id="26">A focused annotation study found </span><strong><span class="sentence" data-audio="audio/s0053.mp3" data-sentence-id="26">~4% of summaries contain minor hallucinations</span></strong><span class="sentence" data-audio="audio/s0053.mp3" data-sentence-id="26"> that </span><strong><span class="sentence" data-audio="audio/s0053.mp3" data-sentence-id="26">do not propagate to parent nodes</span></strong><span class="sentence" data-audio="audio/s0053.mp3" data-sentence-id="26"> and have no measurable downstream effect — useful empirical evidence for "summarize-then-summarize" being safer than feared.</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0055.mp3" data-sentence-id="27">Two querying strategies</span></strong><span class="sentence" data-audio="audio/s0055.mp3" data-sentence-id="27"> sit on top of the tree.</span> <span class="sentence" data-audio="audio/s0057.mp3" data-sentence-id="28">They are evaluated head-to-head, and the simpler one wins:</span></p>
+<ul>
+<li><strong><span class="sentence" data-audio="audio/s0059.mp3" data-sentence-id="29">Tree traversal.</span></strong> <span class="sentence" data-audio="audio/s0061.mp3" data-sentence-id="30">Start at the root.</span> <span class="sentence" data-audio="audio/s0063.mp3" data-sentence-id="31">Take top-k by cosine similarity.</span> <span class="sentence" data-audio="audio/s0065.mp3" data-sentence-id="32">Descend into those nodes' children, top-k again.</span> <span class="sentence" data-audio="audio/s0067.mp3" data-sentence-id="33">Repeat for $d$ layers.</span> <span class="sentence" data-audio="audio/s0069.mp3" data-sentence-id="34">Concatenate.</span></li>
+<li><strong><span class="sentence" data-audio="audio/s0071.mp3" data-sentence-id="35">Collapsed tree.</span></strong> <span class="sentence" data-audio="audio/s0073.mp3" data-sentence-id="36">Flatten the entire tree into one bag of nodes.</span> <span class="sentence" data-audio="audio/s0075.mp3" data-sentence-id="37">Cosine-rank against the query.</span> <span class="sentence" data-audio="audio/s0077.mp3" data-sentence-id="38">Take top nodes until you hit a token budget (they use 2000 tokens, ≈ top-20).</span></li>
+</ul>
+<p><span class="sentence" data-audio="audio/s0079.mp3" data-sentence-id="39">The collapsed-tree approach consistently wins.</span> <span class="sentence" data-audio="audio/s0081.mp3" data-sentence-id="40">The reason the authors give is structural: tree traversal has a </span><em><span class="sentence" data-audio="audio/s0081.mp3" data-sentence-id="40">fixed</span></em><span class="sentence" data-audio="audio/s0081.mp3" data-sentence-id="40"> ratio of nodes-per-layer in its result, so the abstract/detail mix is decided by the topology rather than by the question.</span> <span class="sentence" data-audio="audio/s0083.mp3" data-sentence-id="41">Collapsed tree lets the question's level of granularity decide which layer's nodes get retrieved.</span></p>
+<h2>Comparison</h2>
+<p><span class="sentence" data-audio="audio/s0085.mp3" data-sentence-id="42">Three datasets, picked specifically to stress long-document reasoning: </span><strong><span class="sentence" data-audio="audio/s0085.mp3" data-sentence-id="42">NarrativeQA</span></strong><span class="sentence" data-audio="audio/s0085.mp3" data-sentence-id="42"> (books and movie scripts, full text), </span><strong><span class="sentence" data-audio="audio/s0085.mp3" data-sentence-id="42">QASPER</span></strong><span class="sentence" data-audio="audio/s0085.mp3" data-sentence-id="42"> (questions over full NLP papers), </span><strong><span class="sentence" data-audio="audio/s0085.mp3" data-sentence-id="42">QuALITY</span></strong><span class="sentence" data-audio="audio/s0085.mp3" data-sentence-id="42"> (multiple-choice over ~5,000-token passages, plus a HARD subset where humans fail under time pressure).</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0087.mp3" data-sentence-id="43">Controlled retrieval-only ablation (UnifiedQA-3B as reader, SBERT/BM25/DPR ± RAPTOR):</span></strong></p>
+<table>
+<thead>
+<tr>
+<th><span class="sentence" data-audio="audio/s0089.mp3" data-sentence-id="44">Reader: UnifiedQA-3B</span></th>
+<th><span class="sentence" data-audio="audio/s0091.mp3" data-sentence-id="45">QuALITY Acc</span></th>
+<th><span class="sentence" data-audio="audio/s0093.mp3" data-sentence-id="46">QASPER F1</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="sentence" data-audio="audio/s0095.mp3" data-sentence-id="47">SBERT + RAPTOR</span></td>
+<td><strong><span class="sentence" data-audio="audio/s0097.mp3" data-sentence-id="48">56.6%</span></strong></td>
+<td><strong><span class="sentence" data-audio="audio/s0099.mp3" data-sentence-id="49">36.7%</span></strong></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0101.mp3" data-sentence-id="50">SBERT alone</span></td>
+<td><span class="sentence" data-audio="audio/s0103.mp3" data-sentence-id="51">54.9%</span></td>
+<td><span class="sentence" data-audio="audio/s0105.mp3" data-sentence-id="52">36.2%</span></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0107.mp3" data-sentence-id="53">BM25 + RAPTOR</span></td>
+<td><strong><span class="sentence" data-audio="audio/s0109.mp3" data-sentence-id="54">52.1%</span></strong></td>
+<td><strong><span class="sentence" data-audio="audio/s0111.mp3" data-sentence-id="55">27.0%</span></strong></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0113.mp3" data-sentence-id="56">BM25 alone</span></td>
+<td><span class="sentence" data-audio="audio/s0115.mp3" data-sentence-id="57">49.9%</span></td>
+<td><span class="sentence" data-audio="audio/s0117.mp3" data-sentence-id="58">26.5%</span></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0119.mp3" data-sentence-id="59">DPR + RAPTOR</span></td>
+<td><strong><span class="sentence" data-audio="audio/s0121.mp3" data-sentence-id="60">54.7%</span></strong></td>
+<td><strong><span class="sentence" data-audio="audio/s0123.mp3" data-sentence-id="61">32.2%</span></strong></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0125.mp3" data-sentence-id="62">DPR alone</span></td>
+<td><span class="sentence" data-audio="audio/s0127.mp3" data-sentence-id="63">53.1%</span></td>
+<td><span class="sentence" data-audio="audio/s0129.mp3" data-sentence-id="64">31.7%</span></td>
+</tr>
+</tbody>
+</table>
+<p><span class="sentence" data-audio="audio/s0131.mp3" data-sentence-id="65">Adding the RAPTOR tree on top of </span><em><span class="sentence" data-audio="audio/s0131.mp3" data-sentence-id="65">any</span></em><span class="sentence" data-audio="audio/s0131.mp3" data-sentence-id="65"> retriever improves it — the gain is consistent, modest, retriever-agnostic.</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0133.mp3" data-sentence-id="66">State-of-the-art when paired with GPT-4:</span></strong></p>
+<table>
+<thead>
+<tr>
+<th><span class="sentence" data-audio="audio/s0135.mp3" data-sentence-id="67">Dataset</span></th>
+<th><span class="sentence" data-audio="audio/s0137.mp3" data-sentence-id="68">Prev.</span> <span class="sentence" data-audio="audio/s0139.mp3" data-sentence-id="69">SOTA</span></th>
+<th><span class="sentence" data-audio="audio/s0141.mp3" data-sentence-id="70">RAPTOR + GPT-4</span></th>
+<th>Δ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="sentence" data-audio="audio/s0143.mp3" data-sentence-id="71">QASPER (F1)</span></td>
+<td><span class="sentence" data-audio="audio/s0145.mp3" data-sentence-id="72">CoLT5-XL 53.9%</span></td>
+<td><strong><span class="sentence" data-audio="audio/s0147.mp3" data-sentence-id="73">55.7%</span></strong></td>
+<td>+1.8</td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0149.mp3" data-sentence-id="74">QuALITY (Acc)</span></td>
+<td><span class="sentence" data-audio="audio/s0151.mp3" data-sentence-id="75">CoLISA 62.3%</span></td>
+<td><strong><span class="sentence" data-audio="audio/s0153.mp3" data-sentence-id="76">82.6%</span></strong></td>
+<td><strong><span class="sentence" data-audio="audio/s0155.mp3" data-sentence-id="77">+20.3</span></strong></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0157.mp3" data-sentence-id="78">QuALITY-HARD</span></td>
+<td><span class="sentence" data-audio="audio/s0159.mp3" data-sentence-id="79">CoLISA 54.7%</span></td>
+<td><strong><span class="sentence" data-audio="audio/s0161.mp3" data-sentence-id="80">76.2%</span></strong></td>
+<td><strong><span class="sentence" data-audio="audio/s0163.mp3" data-sentence-id="81">+21.5</span></strong></td>
+</tr>
+<tr>
+<td><span class="sentence" data-audio="audio/s0165.mp3" data-sentence-id="82">NarrativeQA (METEOR)</span></td>
+<td><span class="sentence" data-audio="audio/s0167.mp3" data-sentence-id="83">Izacard&amp;Grave 11.1</span></td>
+<td><strong><span class="sentence" data-audio="audio/s0169.mp3" data-sentence-id="84">19.1</span></strong><span class="sentence" data-audio="audio/s0169.mp3" data-sentence-id="84"> </span><em><span class="sentence" data-audio="audio/s0169.mp3" data-sentence-id="84">(w/ UnifiedQA)</span></em></td>
+<td>+8.0</td>
+</tr>
+</tbody>
+</table>
+<p><span class="sentence" data-audio="audio/s0171.mp3" data-sentence-id="85">The QuALITY result is the headline — a 20-point absolute jump on a multi-step-reasoning multiple-choice benchmark, and 21.5 points on the human-hard subset.</span> <span class="sentence" data-audio="audio/s0173.mp3" data-sentence-id="86">This is the result that put RAPTOR on every subsequent RAG-architecture paper's related-work section.</span></p>
+<p><strong><span class="sentence" data-audio="audio/s0175.mp3" data-sentence-id="87">The tree-layer ablation is what makes the methodology defensible</span></strong><span class="sentence" data-audio="audio/s0175.mp3" data-sentence-id="87"> (Table 8 in the paper).</span> <span class="sentence" data-audio="audio/s0177.mp3" data-sentence-id="88">On a single QuALITY story, querying only leaf nodes gives 57.9%; querying 2 layers from layer 2 gives 63.15%; querying all 3 layers from layer 2 gives </span><strong><span class="sentence" data-audio="audio/s0177.mp3" data-sentence-id="88">73.68%</span></strong><span class="sentence" data-audio="audio/s0177.mp3" data-sentence-id="88">.</span> <span class="sentence" data-audio="audio/s0179.mp3" data-sentence-id="89">The full tree is doing real work; it isn't just a clever way of duplicating leaf information.</span></p>
+<h2>Summary</h2>
+<p><span class="sentence" data-audio="audio/s0181.mp3" data-sentence-id="90">RAPTOR is the cleanest statement of one specific idea: </span><strong><span class="sentence" data-audio="audio/s0181.mp3" data-sentence-id="90">retrieval should be able to choose the level of abstraction</span></strong><span class="sentence" data-audio="audio/s0181.mp3" data-sentence-id="90">.</span> <span class="sentence" data-audio="audio/s0183.mp3" data-sentence-id="91">The mechanism — recursive cluster+summarize over text chunks — is mechanically simple, but the design choices are deliberate:</span></p>
+<ul>
+<li><strong><span class="sentence" data-audio="audio/s0185.mp3" data-sentence-id="92">Soft clustering</span></strong><span class="sentence" data-audio="audio/s0185.mp3" data-sentence-id="92"> (a chunk can be in multiple summaries) — handles the messiness of real text</span></li>
+<li><strong><span class="sentence" data-audio="audio/s0187.mp3" data-sentence-id="93">GMM + UMAP + BIC</span></strong><span class="sentence" data-audio="audio/s0187.mp3" data-sentence-id="93"> — a defensible probabilistic stack, not magic numbers</span></li>
+<li><strong><span class="sentence" data-audio="audio/s0189.mp3" data-sentence-id="94">Collapsed-tree retrieval</span></strong><span class="sentence" data-audio="audio/s0189.mp3" data-sentence-id="94"> — let the question decide the layer mix, don't preordain it</span></li>
+</ul>
+<p><span class="sentence" data-audio="audio/s0191.mp3" data-sentence-id="95">The empirical case is strong: +20 points on QuALITY against the previous SOTA is the kind of jump that gets a paper into ICLR and stays cited.</span></p>
+<p><span class="sentence" data-audio="audio/s0193.mp3" data-sentence-id="96">Where the paper points forward: RAPTOR builds a </span><em><span class="sentence" data-audio="audio/s0193.mp3" data-sentence-id="96">hierarchy</span></em><span class="sentence" data-audio="audio/s0193.mp3" data-sentence-id="96"> on text, but the hierarchy is a </span><em><span class="sentence" data-audio="audio/s0193.mp3" data-sentence-id="96">tree</span></em><span class="sentence" data-audio="audio/s0193.mp3" data-sentence-id="96"> over </span><em><span class="sentence" data-audio="audio/s0193.mp3" data-sentence-id="96">clusters of chunks</span></em><span class="sentence" data-audio="audio/s0193.mp3" data-sentence-id="96">.</span> <span class="sentence" data-audio="audio/s0195.mp3" data-sentence-id="97">The natural next move is to ask: what if the lower level were an entity-relation </span><strong><span class="sentence" data-audio="audio/s0195.mp3" data-sentence-id="97">graph</span></strong><span class="sentence" data-audio="audio/s0195.mp3" data-sentence-id="97"> rather than a flat embedding space?</span> <span class="sentence" data-audio="audio/s0197.mp3" data-sentence-id="98">That move — replacing the chunk-cluster tree with an LLM-extracted knowledge graph and community-detection-based hierarchy — is exactly Microsoft's GraphRAG, three months later.</span> <span class="sentence" data-audio="audio/s0199.mp3" data-sentence-id="99">And once you have that graph, the next argument (LightRAG, six months after that) is that you can keep the graph and drop the community summaries entirely.</span></p>
+<p><span class="sentence" data-audio="audio/s0201.mp3" data-sentence-id="100">So in the three-paper arc, RAPTOR is the </span><strong><span class="sentence" data-audio="audio/s0201.mp3" data-sentence-id="100">"summarize-the-corpus" pole</span></strong><span class="sentence" data-audio="audio/s0201.mp3" data-sentence-id="100">, GraphRAG is the </span><strong><span class="sentence" data-audio="audio/s0201.mp3" data-sentence-id="100">"graph + summaries" middle</span></strong><span class="sentence" data-audio="audio/s0201.mp3" data-sentence-id="100">, and LightRAG is the </span><strong><span class="sentence" data-audio="audio/s0201.mp3" data-sentence-id="100">"only the graph" pole</span></strong><span class="sentence" data-audio="audio/s0201.mp3" data-sentence-id="100">.</span> <span class="sentence" data-audio="audio/s0203.mp3" data-sentence-id="101">Reading them in order makes it clear that the field's question for 2024 was not "do we need hierarchy?" but "how much of the hierarchy is the LLM-generated summarization layer doing the work, vs the structural layer underneath?"</span> <span class="sentence" data-audio="audio/s0205.mp3" data-sentence-id="102">RAPTOR's evidence — that even tree-organized recursive summaries help, but the </span><em><span class="sentence" data-audio="audio/s0205.mp3" data-sentence-id="102">full tree</span></em><span class="sentence" data-audio="audio/s0205.mp3" data-sentence-id="102"> helps more than any single layer — is the empirical baseline that everything after has to beat.</span></p>
+<p><span class="sentence" data-audio="audio/s0207.mp3" data-sentence-id="103">Open source at </span><a href="https://github.com/parthsarthi03/raptor"><span class="sentence" data-audio="audio/s0207.mp3" data-sentence-id="103">github.com/parthsarthi03/raptor</span></a><span class="sentence" data-audio="audio/s0207.mp3" data-sentence-id="103">.</span> <span class="sentence" data-audio="audio/s0209.mp3" data-sentence-id="104">Stanford NLP, Manning group; expect clean code and reproducible experiments.</span></p>
+
+  </div>
+  <div class="body" data-lang="zh" hidden>
+<h1>RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval —— 研究简报</h1>
+<h2>背景</h2>
+<p>RAPTOR（Stanford，Christopher Manning 组，ICLR 2024）比 Microsoft GraphRAG 早几个月发表，但<strong>诊断完全一样</strong>：标准的 retrieval-augmented LM 一次只取若干段连续短 chunk，这种结构和&quot;需要跨长文本整合信息&quot;的问题天然不匹配。论文里的引子是灰姑娘童话和那个问题 —— <em>&quot;灰姑娘是怎么走到幸福结局的？&quot;</em> —— 任何 top-k 的 100-token 片段都不可能包含答案，你需要的是故事的<strong>整条弧</strong>。</p>
+<p>它的贡献是第一个被广泛接受的&quot;多层级检索&quot;答案：<strong>递归地把文本 chunk 聚类、对每个 cluster 做摘要、再对摘要继续聚类</strong>，直到聚不下去。最终输出是一棵树 —— 叶子是原文本，每一层往上都是 LLM 对下一层的抽象。查询时<strong>所有层一起检索</strong>。</p>
+<p>放到完整的 GraphRAG 弧里看，RAPTOR 是**&quot;树状前身&quot;**：GraphRAG 后来把&quot;层级摘要&quot;这个思路从树挪到了图（社区摘要代替 cluster 摘要），而 LightRAG 干脆主张可以把摘要那层全砍了。</p>
+<h2>核心方案</h2>
+<p><strong>树的构建是整个方法的核心</strong>。三层嵌套的循环，反复迭代直到收敛：</p>
+<p><strong>❶ 切块 + embedding</strong>。语料切成 ~100 token 的连续 chunk（句子保持完整 —— 一句话如果会越过 100-token 边界，整句移到下一个 chunk）。每个 chunk 用 SBERT（<code>multi-qa-mpnet-base-cos-v1</code>）做 embedding，构成<strong>叶子层</strong>。</p>
+<p><strong>❷ 聚类</strong>。在 embedding 上做 Gaussian Mixture Model 的软聚类。两个实现选择很关键：</p>
+<ul>
+<li><strong>UMAP</strong> 先做降维再 GMM，因为高维欧氏距离会失真。通过调整 UMAP 的 <code>n_neighbors</code>，做<strong>两遍</strong>聚类 —— 先全局聚类，再在每个全局 cluster 内做局部聚类。</li>
+<li><strong>BIC</strong>（Bayesian Information Criterion）自动选 cluster 数。然后 EM 求解 GMM 参数。</li>
+</ul>
+<p><strong>软聚类很关键</strong>：一个 chunk 可以同时属于多个 cluster，这吻合真实文本里&quot;一段话承载多个主题&quot;的现实。如果某个 cluster 合并后的上下文超过摘要模型的 token 上限，递归地在内部再聚一次。</p>
+<p><strong>❸ 摘要 + 递归</strong>。每个 cluster 的所有 chunk 喂给 <code>gpt-3.5-turbo</code>，产出一段摘要。这段摘要变成上一层的新节点，再用 SBERT embed，进入下一轮。继续聚类 + 摘要，直到聚不下去。</p>
+<p>一个有针对性的人工标注研究发现：<strong>~4% 的摘要含轻微幻觉</strong>，但<strong>这些错误不会向上层传播</strong>，也对下游 QA 没有可测量的影响 —— 这是&quot;摘要再摘要&quot;这种 pipeline 安全性的有用经验证据。</p>
+<p><strong>两种查询策略</strong>搭在这棵树上做对比，最后<strong>更简单的那个赢了</strong>：</p>
+<ul>
+<li><strong>Tree traversal（树遍历）</strong>。从根开始，按余弦相似度取 top-k。下钻到这些节点的子节点，再 top-k。重复 $d$ 层。结果拼起来。</li>
+<li><strong>Collapsed tree（坍塌树）</strong>。把整棵树拍平成一袋节点。对 query 算余弦排序。从高到低取节点，直到达到 token 预算（论文用 2000 token，约等于 top-20）。</li>
+</ul>
+<p>Collapsed tree 全面占优。论文给的理由有结构性意味：tree traversal 在结果里的&quot;层数比例&quot;是<strong>预先固定</strong>的，所以&quot;抽象/细节&quot;的混合度由树拓扑决定，而不是由 query 决定。Collapsed tree 让 query 自身的粒度去决定该取哪一层的节点。</p>
+<h2>与其他方案对比</h2>
+<p>三个数据集，都是专门挑出来压&quot;长文档推理&quot;的：<strong>NarrativeQA</strong>（书和电影脚本全文）、<strong>QASPER</strong>（针对完整 NLP 论文的提问）、<strong>QuALITY</strong>（~5000 token 段落上的多选题，外加一个 HARD 子集，人类在限时下都做错）。</p>
+<p><strong>控制变量的检索消融实验</strong>（UnifiedQA-3B 当 reader，SBERT/BM25/DPR 各自 ± RAPTOR）：</p>
+<table>
+<thead>
+<tr>
+<th>Reader: UnifiedQA-3B</th>
+<th>QuALITY Acc</th>
+<th>QASPER F1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SBERT + RAPTOR</td>
+<td><strong>56.6%</strong></td>
+<td><strong>36.7%</strong></td>
+</tr>
+<tr>
+<td>SBERT alone</td>
+<td>54.9%</td>
+<td>36.2%</td>
+</tr>
+<tr>
+<td>BM25 + RAPTOR</td>
+<td><strong>52.1%</strong></td>
+<td><strong>27.0%</strong></td>
+</tr>
+<tr>
+<td>BM25 alone</td>
+<td>49.9%</td>
+<td>26.5%</td>
+</tr>
+<tr>
+<td>DPR + RAPTOR</td>
+<td><strong>54.7%</strong></td>
+<td><strong>32.2%</strong></td>
+</tr>
+<tr>
+<td>DPR alone</td>
+<td>53.1%</td>
+<td>31.7%</td>
+</tr>
+</tbody>
+</table>
+<p>在<strong>任意 retriever</strong> 上面套一棵 RAPTOR 树都能提升 —— 涨幅稳定、温和、与具体 retriever 无关。</p>
+<p><strong>搭 GPT-4 时刷的 SOTA</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>前 SOTA</th>
+<th>RAPTOR + GPT-4</th>
+<th>Δ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QASPER (F1)</td>
+<td>CoLT5-XL 53.9%</td>
+<td><strong>55.7%</strong></td>
+<td>+1.8</td>
+</tr>
+<tr>
+<td>QuALITY (Acc)</td>
+<td>CoLISA 62.3%</td>
+<td><strong>82.6%</strong></td>
+<td><strong>+20.3</strong></td>
+</tr>
+<tr>
+<td>QuALITY-HARD</td>
+<td>CoLISA 54.7%</td>
+<td><strong>76.2%</strong></td>
+<td><strong>+21.5</strong></td>
+</tr>
+<tr>
+<td>NarrativeQA (METEOR)</td>
+<td>Izacard&amp;Grave 11.1</td>
+<td><strong>19.1</strong> <em>(配 UnifiedQA)</em></td>
+<td>+8.0</td>
+</tr>
+</tbody>
+</table>
+<p>QuALITY 上的数字是这篇论文的代表性成果 —— 在一个&quot;多步推理多选题&quot;上<strong>绝对值 +20 个点</strong>，HARD 子集 +21.5 点。正是这个数把 RAPTOR 钉进了之后每一篇 RAG 架构论文的 related work 章节。</p>
+<p><strong>层数消融实验是方法论站得住脚的关键</strong>（论文 Table 8）。同一个 QuALITY 故事上：只查叶子节点拿 57.9%；从第 2 层往下查 2 层拿 63.15%；从第 2 层往下查全部 3 层拿 <strong>73.68%</strong>。<strong>整棵树确实在做事</strong>，不是叶子信息的花式重复。</p>
+<h2>总结</h2>
+<p>RAPTOR 把一个具体的主张表达得很干净：<strong>检索应当能选择抽象层级</strong>。机制本身（递归 cluster + 摘要）机械上不复杂，但每个设计选择都有目的：</p>
+<ul>
+<li><strong>软聚类</strong>（一个 chunk 可以进多个摘要）—— 承认真实文本的多主题性</li>
+<li><strong>GMM + UMAP + BIC</strong> —— 站得住脚的概率框架，不是拍脑袋数字</li>
+<li><strong>Collapsed-tree 检索</strong> —— 让 query 决定层级混合，不预先固定</li>
+</ul>
+<p>实证站得住：QuALITY 上比前 SOTA 多 20 个点，这种跃迁级数才会被 ICLR 收、之后被反复引。</p>
+<p><strong>这篇论文向前指了一条路</strong>：RAPTOR 在文本上构建了<strong>层级</strong>，但这个层级是 <strong>chunk-cluster 之上的树</strong>。下一步自然的问题是 —— 如果底层不是扁平的 embedding 空间，而是一张<strong>实体-关系图</strong>呢？把&quot;chunk-cluster 树&quot;换成&quot;LLM 抽取的知识图谱 + 社区检测层级&quot;，这就是三个月后的 Microsoft GraphRAG。而一旦有了那张图，下一个论断（再六个月之后的 LightRAG）就是：图可以保留，社区摘要那层可以全砍掉。</p>
+<p>所以三篇放一起读：<strong>RAPTOR 是&quot;摘要整个语料&quot;的极</strong>，GraphRAG 是&quot;图 + 摘要&quot;的中间态，LightRAG 是&quot;只剩图&quot;的另一极。按这个顺序读会发现 —— 2024 年这个领域真正的问题不是&quot;要不要分层&quot;，而是&quot;分层里 LLM 摘要那层和底下的结构层，到底谁在干活？&quot;RAPTOR 给的实证基线是：即便摘要本身有用，<strong>完整树</strong>比任何单层都更有用。后面所有论文都得在这个基线上往前走。</p>
+<p>代码开源在 <a href="https://github.com/parthsarthi03/raptor">github.com/parthsarthi03/raptor</a>。Stanford NLP，Manning 组出品，代码质量和实验可复现性都靠谱。</p>
+
+</div>
+</article>
+<footer>
+  <span>Compiled from arXiv:2401.18059v1</span>
+  <a href="http://arxiv.org/abs/2401.18059v1">View on arXiv →</a>
+</footer>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}, {left: '\\[', right: '\\]', display: true}, {left: '\\(', right: '\\)', display: false}], throwOnError: false, ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']})"></script>
+<script>
+(function() {
+  const buttons = document.querySelectorAll('.lang-switch button');
+  const bodies = document.querySelectorAll('.body');
+  buttons.forEach(btn => btn.addEventListener('click', () => {
+    const lang = btn.dataset.lang;
+    buttons.forEach(b => {
+      b.classList.toggle('active', b === btn);
+      b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+    });
+    bodies.forEach(body => {
+      const matches = body.dataset.lang === lang;
+      body.hidden = !matches;
+    });
+    if (window.location.hash !== '#' + lang) {
+      history.replaceState(null, '', '#' + lang);
+    }
+  }));
+  const initial = (window.location.hash || '#en').slice(1);
+  const target = document.querySelector(`.lang-switch button[data-lang="${initial}"]`);
+  if (target) target.click();
+})();
+</script>
+<script>
+(function() {
+  let currentId = null;
+  let audio = null;
+
+  function setPlaying(id, on) {
+    const sel = `.sentence[data-sentence-id="${id}"]`;
+    document.querySelectorAll(sel).forEach(el => el.classList.toggle('playing', on));
+  }
+
+  // Highlight all fragments of a sentence on hover, not just the one under cursor.
+  document.addEventListener('mouseover', e => {
+    const s = e.target.closest('.sentence');
+    if (!s) return;
+    const id = s.dataset.sentenceId;
+    if (id != null) {
+      document.querySelectorAll(`.sentence[data-sentence-id="${id}"]`)
+        .forEach(el => el.classList.add('hover'));
+    }
+  });
+  document.addEventListener('mouseout', e => {
+    const s = e.target.closest('.sentence');
+    if (!s) return;
+    const id = s.dataset.sentenceId;
+    if (id != null) {
+      document.querySelectorAll(`.sentence[data-sentence-id="${id}"]`)
+        .forEach(el => el.classList.remove('hover'));
+    }
+  });
+
+  document.addEventListener('click', e => {
+    const span = e.target.closest('.sentence');
+    if (!span) return;
+    const src = span.dataset.audio;
+    const id = span.dataset.sentenceId;
+    if (!src || id == null) return;
+    if (currentId === id && audio && !audio.paused) {
+      audio.pause();
+      setPlaying(currentId, false);
+      currentId = null;
+      return;
+    }
+    if (audio) audio.pause();
+    if (currentId !== null) setPlaying(currentId, false);
+    audio = new Audio(src);
+    audio.addEventListener('ended', () => { setPlaying(id, false); });
+    audio.play().catch(err => console.warn('audio play failed', err));
+    setPlaying(id, true);
+    currentId = id;
+  });
+})();
+</script>
+</body>
+</html>
