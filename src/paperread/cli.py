@@ -600,7 +600,7 @@ def report_index(
     if not no_browser:
         import webbrowser
 
-        webbrowser.open(out.as_uri())
+        webbrowser.open(out.resolve().as_uri())
 
 
 _NOJEKYLL_NOTE = "# Empty — disables Jekyll on GitHub Pages so '_'-prefixed dirs stay served.\n"
