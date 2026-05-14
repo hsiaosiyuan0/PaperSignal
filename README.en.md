@@ -6,9 +6,11 @@ CLI for an LLM to **discover, download, analyze, and publish** arXiv papers as
 self-contained bilingual research briefs — readable in the browser, narrated
 by Edge TTS, deployable to GitHub Pages.
 
+> [!TIP]
+> **Live site** → <https://hsiaosiyuan0.github.io/PaperSignal/>
+
 The Python package and CLI command are both named `paperread`; the project
-itself is **PaperSignal**, and the published site lives at
-[hsiaosiyuan0.github.io/PaperSignal](https://hsiaosiyuan0.github.io/PaperSignal/).
+itself is **PaperSignal**.
 
 ---
 

@@ -5,8 +5,10 @@
 一个面向 LLM 的命令行工具：让模型**发现、下载、分析、发布** arXiv 论文，生成
 自包含的双语研究简报 —— 浏览器里可读，Edge TTS 朗读，可直接部署到 GitHub Pages。
 
-Python 包名与 CLI 命令均为 `paperread`，项目名是 **PaperSignal**，
-发布站点位于 [hsiaosiyuan0.github.io/PaperSignal](https://hsiaosiyuan0.github.io/PaperSignal/)。
+> [!TIP]
+> **在线预览** → <https://hsiaosiyuan0.github.io/PaperSignal/>
+
+Python 包名与 CLI 命令均为 `paperread`，项目名是 **PaperSignal**。
 
 ---
 
