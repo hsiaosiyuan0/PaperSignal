@@ -1,0 +1,21 @@
+README.md
+  s_c8e5f83f3118b3::t_052bca37e0dc34 8-11
+README.en.md
+  s_c8e5f83f3118b3::t_bea5464979f85d 9-11,13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "6e28acfbb72dbabbea94f4d8cfc2d2b2755597f8",
+  "prompts": {},
+  "sessions": {
+    "s_c8e5f83f3118b3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bfef6a8f-f215-48b9-b257-fc79518e38b5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "hsiaosiyuan0 <hsiaosiyuan0@outlook.com>"
+    }
+  }
+}
