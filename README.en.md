@@ -41,33 +41,50 @@ a free [OpenAlex API key](https://openalex.org/) for sustained `discover` usage.
 
 ---
 
-## Quick start (the full LLM workflow)
+## Quick start
+
+The entry point is **Claude Code CLI** (or any coding agent you prefer). You
+don't run `paperread` yourself — you ask in natural language, and the agent
+invokes subcommands as needed, consumes their JSON output, and uses its own
+Read/Write to author the analysis.
+
+For example, in Claude Code you say:
+
+> Find recent Microsoft papers on knowledge retrieval, pick one worth reading,
+> and turn it into a research brief.
+
+The agent then runs roughly this chain on your behalf:
 
 ```bash
-# 1. Find recent Microsoft papers on knowledge retrieval
+# 1. Pull a candidate list for the agent to choose from
 uv run paperread discover "knowledge retrieval" \
-  --affiliation Microsoft --year 2025- --top 10
+  --affiliation Microsoft --year 2025- --top 10 --json
 
-# 2. Pick one (say 2604.15597) and prep it
-uv run paperread convert 2604.15597
-DIR=$(uv run paperread report path 2604.15597)
+# 2. Once it picks <arxiv_id>, download PDF + convert to Markdown
+uv run paperread convert <arxiv_id>
 
-# 3. Have the LLM write the analysis. It should read:
-uv run paperread cache show 2604.15597 --json
-# then Write to:
-#   $DIR/report.en.md
-#   $DIR/report.zh.md
+# 3. Agent reads the full text + metadata
+uv run paperread cache show <arxiv_id> --json
 
-# 4. Build (segments sentences, runs Edge TTS, renders index.html)
-uv run paperread report build 2604.15597
+# 4. Agent uses its own Write to drop the bilingual analysis into:
+#    (path is given by `paperread report path <arxiv_id>`)
+#      report.en.md
+#      report.zh.md
 
-# 5. Refresh the archive landing page + view locally
+# 5. Segment sentences, run Edge TTS, render HTML
+uv run paperread report build <arxiv_id>
+
+# 6. Refresh archive index + view in browser
 uv run paperread report index
-uv run paperread report open 2604.15597
+uv run paperread report open <arxiv_id>
 ```
 
-A sample LLM analysis ships under [`reports/1706.03762v7/`](reports/1706.03762v7/) —
-"Attention Is All You Need".
+The whole CLI is designed for LLM consumption: every search / read command
+takes `--json` and returns stable structured data; the analysis-writing step
+is just the agent's native Read/Write — no extra scaffolding needed.
+
+Sample output: [`reports/1706.03762v7/`](reports/1706.03762v7/) — a research
+brief for *Attention Is All You Need*.
 
 ---
 

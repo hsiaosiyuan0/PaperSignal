@@ -39,33 +39,47 @@ cp .env.example .env # 然后把 OpenAlex key 填进 .env
 
 ---
 
-## 快速开始（完整的 LLM 工作流）
+## 快速开始
+
+工作流的入口是 **Claude Code CLI**（或任意你常用的 coding agent）。你不需要
+自己敲 `paperread` —— 用自然语言提需求，让 Claude 按需调起子命令、消费 JSON
+输出、用自己的 Read/Write 写分析文档。
+
+比如，你在 Claude Code 里说：
+
+> 帮我找微软 2025 年关于知识检索的论文，挑一篇值得读的写成研究简报。
+
+Claude 大致会跑这条链路（你看到的只是结果，命令是它自己调的）：
 
 ```bash
-# 1. 找微软最近关于知识检索的论文
+# 1. 拉候选清单，让 Claude 自己挑
 uv run paperread discover "knowledge retrieval" \
-  --affiliation Microsoft --year 2025- --top 10
+  --affiliation Microsoft --year 2025- --top 10 --json
 
-# 2. 选一篇（比如 2604.15597），准备好资料
-uv run paperread convert 2604.15597
-DIR=$(uv run paperread report path 2604.15597)
+# 2. 选定 <arxiv_id> 后，下 PDF + 转 Markdown
+uv run paperread convert <arxiv_id>
 
-# 3. 让 LLM 写分析。它应当读：
-uv run paperread cache show 2604.15597 --json
-# 然后把分析写入：
-#   $DIR/report.en.md
-#   $DIR/report.zh.md
+# 3. Claude 读全文 + 元数据
+uv run paperread cache show <arxiv_id> --json
 
-# 4. 构建（切句、跑 Edge TTS、渲染 index.html）
-uv run paperread report build 2604.15597
+# 4. Claude 用自己的 Write 把双语分析落到这两个文件
+#    （路径由 `paperread report path <arxiv_id>` 给出）
+#      report.en.md
+#      report.zh.md
 
-# 5. 刷新归档首页 + 本地查看
+# 5. 切句、Edge TTS、渲染 HTML
+uv run paperread report build <arxiv_id>
+
+# 6. 刷归档首页 + 浏览器查看
 uv run paperread report index
-uv run paperread report open 2604.15597
+uv run paperread report open <arxiv_id>
 ```
 
-[`reports/1706.03762v7/`](reports/1706.03762v7/) 下有一份 LLM 分析样本 ——
-《Attention Is All You Need》。
+整条 CLI 是按 LLM 消费来设计的：所有检索/读取命令都支持 `--json`，输出稳定
+的结构化数据；分析撰写直接交给 agent 的 Read/Write，不需要额外脚手架。
+
+样本产出：[`reports/1706.03762v7/`](reports/1706.03762v7/) ——
+《Attention Is All You Need》的研究简报。
 
 ---
 
