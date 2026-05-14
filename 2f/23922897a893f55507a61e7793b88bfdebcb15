@@ -1,0 +1,21 @@
+README.en.md
+  s_c8e5f83f3118b3::t_003235fcfaf480 44-56,59,61-64,66-67,69-72,74-75,77,79,82-87
+README.md
+  s_c8e5f83f3118b3::t_2b0732333f55b2 42-52,55,57-60,62-63,65-68,70-71,73,75,78-82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "2f23922897a893f55507a61e7793b88bfdebcb15",
+  "prompts": {},
+  "sessions": {
+    "s_c8e5f83f3118b3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bfef6a8f-f215-48b9-b257-fc79518e38b5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "hsiaosiyuan0 <hsiaosiyuan0@outlook.com>"
+    }
+  }
+}
