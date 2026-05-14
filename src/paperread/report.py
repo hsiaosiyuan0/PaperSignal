@@ -290,14 +290,16 @@ def _build_page(
 
     toggle = ""
     zh_block = ""
+    en_attrs = ""
     if has_zh:
         toggle = (
             '<div class="lang-switch" role="tablist" aria-label="Language">'
-            '<button class="active" data-lang="en" aria-selected="true">EN</button>'
-            '<button data-lang="zh" aria-selected="false">中</button>'
+            '<button data-lang="en" aria-selected="false">EN</button>'
+            '<button class="active" data-lang="zh" aria-selected="true">中</button>'
             "</div>"
         )
-        zh_block = f'<div class="body" data-lang="zh" hidden>\n{zh_body}\n</div>'
+        zh_block = f'<div class="body" data-lang="zh">\n{zh_body}\n</div>'
+        en_attrs = " hidden"
 
     return _TEMPLATE.format(
         title=title,
@@ -308,6 +310,7 @@ def _build_page(
         generated=generated,
         authors=authors,
         en_body=en_body,
+        en_attrs=en_attrs,
         zh_block=zh_block,
         toggle=toggle,
         css=_CSS,
@@ -648,7 +651,7 @@ _TOGGLE_JS = """
       history.replaceState(null, '', '#' + lang);
     }
   }));
-  const initial = (window.location.hash || '#en').slice(1);
+  const initial = (window.location.hash || '#zh').slice(1);
   const target = document.querySelector(`.lang-switch button[data-lang="${initial}"]`);
   if (target) target.click();
 })();
@@ -739,7 +742,7 @@ _TEMPLATE = """<!doctype html>
   </div>
   <h1 class="title">{title}</h1>
   <p class="authors">{authors}</p>
-  <div class="body" data-lang="en">
+  <div class="body" data-lang="en"{en_attrs}>
 {en_body}
   </div>
   {zh_block}

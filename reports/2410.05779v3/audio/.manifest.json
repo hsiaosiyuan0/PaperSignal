@@ -11,619 +11,625 @@
       "index": 1,
       "text": "Its starting move is to accept GraphRAG's diagnosis — flat-chunk vector RAG can't capture entity interdependencies and gives fragmented answers — and reject GraphRAG's prescription as too expensive.",
       "hash": "304c1631d6c69aff",
-      "filename": "s0003.mp3"
+      "filename": "s0002.mp3"
     },
     {
       "index": 2,
       "text": "The motivating example in the paper is sharp: a user asks \"How does the rise of electric vehicles influence urban air quality and public transportation infrastructure?\"",
       "hash": "303982b39f3ef5e9",
-      "filename": "s0005.mp3"
+      "filename": "s0004.mp3"
     },
     {
       "index": 3,
       "text": "Vector RAG retrieves separate documents on EVs, air pollution, and transportation, then fails to synthesize the cross-topic relationships.",
       "hash": "257cffe59453c620",
-      "filename": "s0007.mp3"
+      "filename": "s0006.mp3"
     },
     {
       "index": 4,
       "text": "So you need graph structure.",
       "hash": "e1931be260aca18d",
-      "filename": "s0009.mp3"
+      "filename": "s0008.mp3"
     },
     {
       "index": 5,
       "text": "But Microsoft GraphRAG's answer — build a community hierarchy, generate community summaries at every level, traverse them at query time — burns hundreds of thousands of tokens per query and hours to (re-)index.",
       "hash": "8937830f89206e43",
-      "filename": "s0011.mp3"
+      "filename": "s0010.mp3"
     },
     {
       "index": 6,
       "text": "In dynamic domains where data changes daily, that cost compounds.",
       "hash": "9574dc9b2cf82b8a",
-      "filename": "s0013.mp3"
+      "filename": "s0012.mp3"
     },
     {
       "index": 7,
       "text": "LightRAG's claim: you can get the same retrieval quality (or better) with a much simpler graph index and dual-level keyword retrieval, while making incremental updates almost free.",
       "hash": "6c1f3bcb757425d3",
-      "filename": "s0015.mp3"
+      "filename": "s0014.mp3"
     },
     {
       "index": 8,
       "text": "Three deliberate simplifications relative to Microsoft GraphRAG, each connected to one of the paper's stated efficiency goals.",
       "hash": "e4fb0a1604050e41",
-      "filename": "s0017.mp3"
+      "filename": "s0016.mp3"
     },
     {
       "index": 9,
       "text": "❶ Graph-based text indexing without community summaries.",
       "hash": "75ad689f5d0c1177",
-      "filename": "s0019.mp3"
+      "filename": "s0018.mp3"
     },
     {
       "index": 10,
       "text": "Documents are chunked (1200 tokens).",
       "hash": "615bbd48b9521fe9",
-      "filename": "s0021.mp3"
+      "filename": "s0020.mp3"
     },
     {
       "index": 11,
       "text": "An LLM extracts entities and relationships, generating short text descriptions for each.",
       "hash": "1cca5b8ff656934c",
-      "filename": "s0023.mp3"
+      "filename": "s0022.mp3"
     },
     {
       "index": 12,
       "text": "Then — and this is the key efficiency move — a profiling function generates a key-value pair for every node and edge:",
       "hash": "a5e020b51d2982b3",
-      "filename": "s0025.mp3"
+      "filename": "s0024.mp3"
     },
     {
       "index": 13,
       "text": "Key: a word or short phrase enabling fast retrieval (entity name; for relations, multiple keys including LLM-derived \"global themes\")",
       "hash": "85ab078d17e4337d",
-      "filename": "s0027.mp3"
+      "filename": "s0026.mp3"
     },
     {
       "index": 14,
       "text": "Value: a paragraph summarizing relevant snippets",
       "hash": "0f572c280bdc5a7b",
-      "filename": "s0029.mp3"
+      "filename": "s0028.mp3"
     },
     {
       "index": 15,
       "text": "Duplicates are merged via a dedup function.",
       "hash": "ffb4f38c81992fdb",
-      "filename": "s0031.mp3"
+      "filename": "s0030.mp3"
     },
     {
       "index": 16,
       "text": "The resulting structure is a graph stored as a vector DB keyed on those KV pairs.",
       "hash": "62f17db3a98cc9dd",
-      "filename": "s0033.mp3"
+      "filename": "s0032.mp3"
     },
     {
       "index": 17,
       "text": "Note what's missing: no community detection, no community summaries, no hierarchical aggregation.",
       "hash": "fddc2493c4477031",
-      "filename": "s0035.mp3"
+      "filename": "s0034.mp3"
     },
     {
       "index": 18,
       "text": "That's the cost cut.",
       "hash": "ba3eaf5e78ec4f57",
-      "filename": "s0037.mp3"
+      "filename": "s0036.mp3"
     },
     {
       "index": 19,
       "text": "❷ Dual-level retrieval.",
       "hash": "fbc64cc8f0277d06",
-      "filename": "s0039.mp3"
+      "filename": "s0038.mp3"
     },
     {
       "index": 20,
       "text": "Queries are classified along a granularity axis:",
       "hash": "dd9fb23c045e84a8",
-      "filename": "s0041.mp3"
+      "filename": "s0040.mp3"
     },
     {
       "index": 21,
       "text": "Low-level / specific queries → \"Who wrote Pride and Prejudice?\" → retrieve entities + immediate edges",
       "hash": "b69360763f7a57ff",
-      "filename": "s0043.mp3"
+      "filename": "s0042.mp3"
     },
     {
       "index": 22,
       "text": "High-level / abstract queries → \"How does AI influence education?\" → retrieve relations + aggregated themes",
       "hash": "839f74cfceeb92c2",
-      "filename": "s0045.mp3"
+      "filename": "s0044.mp3"
     },
     {
       "index": 23,
       "text": "For a query, LightRAG:",
       "hash": "0c09abc172568626",
-      "filename": "s0047.mp3"
+      "filename": "s0046.mp3"
     },
     {
       "index": 24,
       "text": "Extracts both local keywords and global keywords",
       "hash": "8aa7a439ed632e84",
-      "filename": "s0049.mp3"
+      "filename": "s0048.mp3"
     },
     {
       "index": 25,
       "text": "Vector-matches to candidate entities, to relations",
       "hash": "f81f60f2168d27c1",
-      "filename": "s0051.mp3"
+      "filename": "s0050.mp3"
     },
     {
       "index": 26,
       "text": "Gathers one-hop neighbors of the retrieved nodes and edges to add structural context",
       "hash": "dd0c67d54f9dbaa3",
-      "filename": "s0053.mp3"
+      "filename": "s0052.mp3"
     },
     {
       "index": 27,
       "text": "This replaces GraphRAG's expensive community-traversal map-reduce with a single keyword-matching pass.",
       "hash": "4361a80e74659936",
-      "filename": "s0055.mp3"
+      "filename": "s0054.mp3"
     },
     {
       "index": 28,
       "text": "❸ Incremental updates.",
       "hash": "6fecd65ba53ad174",
-      "filename": "s0057.mp3"
+      "filename": "s0056.mp3"
     },
     {
       "index": 29,
       "text": "When new documents arrive, run the same extraction over the new chunks, then just take the set-union of the new entities/edges with the existing graph.",
       "hash": "e758fedbdb07a815",
-      "filename": "s0059.mp3"
+      "filename": "s0058.mp3"
     },
     {
       "index": 30,
       "text": "No community recomputation.",
       "hash": "75b7a09598ab7100",
-      "filename": "s0061.mp3"
+      "filename": "s0060.mp3"
     },
     {
       "index": 31,
       "text": "No reindexing of unchanged documents.",
       "hash": "8ebba9d6004ed49a",
-      "filename": "s0063.mp3"
+      "filename": "s0062.mp3"
     },
     {
       "index": 32,
       "text": "The new graph is simply .",
       "hash": "df604428438bbe07",
-      "filename": "s0065.mp3"
+      "filename": "s0064.mp3"
     },
     {
       "index": 33,
       "text": "Evaluated on four UltraDomain datasets (Agriculture, CS, Legal, Mix), each between 600K–5M tokens.",
       "hash": "2d94af1f7b2fe929",
-      "filename": "s0067.mp3"
+      "filename": "s0066.mp3"
     },
     {
       "index": 34,
       "text": "Win-rates from LLM-as-judge (GPT-4o-mini) head-to-head, four dimensions:",
       "hash": "1dd7acdf8a2d0a56",
-      "filename": "s0069.mp3"
+      "filename": "s0068.mp3"
     },
     {
       "index": 35,
       "text": "vs. flat-chunk baselines (NaiveRAG, RQ-RAG, HyDE):",
       "hash": "e01060a8d275546a",
-      "filename": "s0071.mp3"
+      "filename": "s0070.mp3"
     },
     {
       "index": 36,
       "text": "Baseline",
       "hash": "e6ab7982fa5d5e8f",
-      "filename": "s0073.mp3"
+      "filename": "s0072.mp3"
     },
     {
       "index": 37,
       "text": "LightRAG win rate (overall)",
       "hash": "85a0d4d5ba8fb5c7",
-      "filename": "s0075.mp3"
+      "filename": "s0074.mp3"
     },
     {
       "index": 38,
       "text": "NaiveRAG",
       "hash": "3c14129287b5872f",
-      "filename": "s0077.mp3"
+      "filename": "s0076.mp3"
     },
     {
       "index": 39,
       "text": "60.0% – 84.8% across datasets",
       "hash": "a2661e9d1a2c26cd",
-      "filename": "s0079.mp3"
+      "filename": "s0078.mp3"
     },
     {
       "index": 40,
       "text": "RQ-RAG",
       "hash": "4cbd25f60b5bb7dd",
-      "filename": "s0081.mp3"
+      "filename": "s0080.mp3"
     },
     {
       "index": 41,
       "text": "60.0% – 85.6%",
       "hash": "bd35b29a0c3e87f1",
-      "filename": "s0083.mp3"
+      "filename": "s0082.mp3"
     },
     {
       "index": 42,
       "text": "HyDE",
       "hash": "89e959a243c51a8c",
-      "filename": "s0085.mp3"
+      "filename": "s0084.mp3"
     },
     {
       "index": 43,
       "text": "57.6% – 75.2%",
       "hash": "a792cd888e9ce5d3",
-      "filename": "s0087.mp3"
+      "filename": "s0086.mp3"
     },
     {
       "index": 44,
       "text": "The win margin grows with corpus size — on the Legal dataset (largest), LightRAG beats NaiveRAG 83.6% / 86.4% / 83.6% / 84.8% on the four dimensions.",
       "hash": "15891982b3eaecb5",
-      "filename": "s0089.mp3"
+      "filename": "s0088.mp3"
     },
     {
       "index": 45,
       "text": "This is the same pattern Microsoft GraphRAG showed against vector RAG; LightRAG inherits it.",
       "hash": "14267c24b17f9929",
-      "filename": "s0091.mp3"
+      "filename": "s0090.mp3"
     },
     {
       "index": 46,
       "text": "vs. Microsoft GraphRAG (the meaningful comparison):",
       "hash": "fad973a1e8036c77",
-      "filename": "s0093.mp3"
+      "filename": "s0092.mp3"
     },
     {
       "index": 47,
       "text": "Dataset",
       "hash": "1052689464e38f50",
-      "filename": "s0095.mp3"
+      "filename": "s0094.mp3"
     },
     {
       "index": 48,
       "text": "Comprehensiveness",
       "hash": "5074f839c099452e",
-      "filename": "s0097.mp3"
+      "filename": "s0096.mp3"
     },
     {
       "index": 49,
       "text": "Diversity",
       "hash": "dcb3f6f3ca9a95e3",
-      "filename": "s0099.mp3"
+      "filename": "s0098.mp3"
     },
     {
       "index": 50,
       "text": "Empowerment",
       "hash": "8e587196edcedeb5",
-      "filename": "s0101.mp3"
+      "filename": "s0100.mp3"
     },
     {
       "index": 51,
       "text": "Overall",
       "hash": "8a528519bdaba69c",
-      "filename": "s0103.mp3"
+      "filename": "s0102.mp3"
     },
     {
       "index": 52,
       "text": "Agriculture",
       "hash": "8d1cd3f01ba8d601",
-      "filename": "s0105.mp3"
+      "filename": "s0104.mp3"
     },
     {
       "index": 53,
       "text": "54.4%",
       "hash": "8b767a2a3d917ee9",
-      "filename": "s0107.mp3"
+      "filename": "s0106.mp3"
     },
     {
       "index": 54,
       "text": "77.2%",
       "hash": "5a55c3c36fe2ea27",
-      "filename": "s0109.mp3"
+      "filename": "s0108.mp3"
     },
     {
       "index": 55,
       "text": "58.8%",
       "hash": "62ed12c06f144780",
-      "filename": "s0111.mp3"
+      "filename": "s0110.mp3"
     },
     {
       "index": 56,
       "text": "54.8%",
       "hash": "3b7eab2d1fa60bae",
-      "filename": "s0113.mp3"
+      "filename": "s0112.mp3"
     },
     {
       "index": 57,
       "text": "51.6%",
       "hash": "22c11fd05c93303b",
-      "filename": "s0115.mp3"
+      "filename": "s0114.mp3"
     },
     {
       "index": 58,
       "text": "59.2%",
       "hash": "e3c9bf75addfef24",
-      "filename": "s0117.mp3"
+      "filename": "s0116.mp3"
     },
     {
       "index": 59,
       "text": "54.8%",
       "hash": "3b7eab2d1fa60bae",
-      "filename": "s0119.mp3"
+      "filename": "s0118.mp3"
     },
     {
       "index": 60,
       "text": "52.0%",
       "hash": "b9e5caf3dcb9fc7a",
-      "filename": "s0121.mp3"
+      "filename": "s0120.mp3"
     },
     {
       "index": 61,
       "text": "Legal",
       "hash": "902c91d94e0fd512",
-      "filename": "s0123.mp3"
+      "filename": "s0122.mp3"
     },
     {
       "index": 62,
       "text": "51.6%",
       "hash": "22c11fd05c93303b",
-      "filename": "s0125.mp3"
+      "filename": "s0124.mp3"
     },
     {
       "index": 63,
       "text": "73.6%",
       "hash": "af14117f2794a3a1",
-      "filename": "s0127.mp3"
+      "filename": "s0126.mp3"
     },
     {
       "index": 64,
       "text": "56.4%",
       "hash": "5dc3bebb4cb4803a",
-      "filename": "s0129.mp3"
+      "filename": "s0128.mp3"
     },
     {
       "index": 65,
       "text": "52.8%",
       "hash": "e8ebe822978cbf5d",
-      "filename": "s0131.mp3"
+      "filename": "s0130.mp3"
     },
     {
       "index": 66,
       "text": "Mix",
       "hash": "fd7391b6720b809c",
-      "filename": "s0133.mp3"
+      "filename": "s0132.mp3"
     },
     {
       "index": 67,
       "text": "49.6%",
       "hash": "9a1952e755aded66",
-      "filename": "s0135.mp3"
+      "filename": "s0134.mp3"
     },
     {
       "index": 68,
       "text": "64.0%",
       "hash": "5e21ba3d1edb7905",
-      "filename": "s0137.mp3"
+      "filename": "s0136.mp3"
     },
     {
       "index": 69,
       "text": "49.2%",
       "hash": "415d674a2ea39a8d",
-      "filename": "s0139.mp3"
+      "filename": "s0138.mp3"
     },
     {
       "index": 70,
       "text": "49.6%",
       "hash": "9a1952e755aded66",
-      "filename": "s0141.mp3"
+      "filename": "s0140.mp3"
     },
     {
       "index": 71,
       "text": "Comprehensiveness and Empowerment are roughly tied with GraphRAG; the consistent win is on Diversity (largest gaps in Agriculture and Legal).",
       "hash": "d19b9acf0a7012d6",
-      "filename": "s0143.mp3"
+      "filename": "s0142.mp3"
     },
     {
       "index": 72,
       "text": "The dual-level retrieval surfaces broader topic mixtures than community-summary traversal — the result the authors most lean on.",
       "hash": "e528b2a165fbf3fa",
-      "filename": "s0145.mp3"
+      "filename": "s0144.mp3"
     },
     {
       "index": 73,
       "text": "The cost comparison is where LightRAG actually decides things.",
       "hash": "7de784b959d79ba5",
-      "filename": "s0147.mp3"
+      "filename": "s0146.mp3"
     },
     {
       "index": 74,
       "text": "On the Legal dataset retrieval phase:",
       "hash": "f7e352921151c6ff",
-      "filename": "s0149.mp3"
+      "filename": "s0148.mp3"
     },
     {
       "index": 75,
       "text": "Phase",
       "hash": "f6371a4980dacd0f",
-      "filename": "s0151.mp3"
+      "filename": "s0150.mp3"
     },
     {
       "index": 76,
       "text": "GraphRAG",
       "hash": "0f8c3038521a6278",
-      "filename": "s0153.mp3"
+      "filename": "s0152.mp3"
+    },
+    {
+      "index": 77,
+      "text": "LightRAG",
+      "hash": "8eddc2fd0d38502e",
+      "filename": "s0154.mp3"
     },
     {
       "index": 78,
       "text": "Retrieval tokens (per query)",
       "hash": "35dffb5eb9300596",
-      "filename": "s0157.mp3"
+      "filename": "s0156.mp3"
     },
     {
       "index": 79,
       "text": "610 × 1,000 = 610K",
       "hash": "dc6b98c7967edb63",
-      "filename": "s0159.mp3"
+      "filename": "s0158.mp3"
     },
     {
       "index": 80,
       "text": "<100",
       "hash": "bc532ebec32f8f64",
-      "filename": "s0161.mp3"
+      "filename": "s0160.mp3"
     },
     {
       "index": 81,
       "text": "Retrieval API calls",
       "hash": "771e61927e8b299c",
-      "filename": "s0163.mp3"
+      "filename": "s0162.mp3"
     },
     {
       "index": 82,
       "text": "hundreds (one per community)",
       "hash": "e5bd12624e5611a6",
-      "filename": "s0165.mp3"
+      "filename": "s0164.mp3"
     },
     {
       "index": 83,
       "text": "Incremental update",
       "hash": "68727299aead4de3",
-      "filename": "s0167.mp3"
+      "filename": "s0166.mp3"
     },
     {
       "index": 84,
       "text": "1,399 × 2 × 5,000 + tokens",
       "hash": "8d0d6ed021dca56a",
-      "filename": "s0169.mp3"
+      "filename": "s0168.mp3"
     },
     {
       "index": 85,
       "text": "tokens",
       "hash": "3391436a4e72f86c",
-      "filename": "s0171.mp3"
+      "filename": "s0170.mp3"
     },
     {
       "index": 86,
       "text": "Incremental API calls",
       "hash": "c65bde6d18630a1b",
-      "filename": "s0173.mp3"
+      "filename": "s0172.mp3"
     },
     {
       "index": 87,
       "text": "2,798 +",
       "hash": "cb931aba77045537",
-      "filename": "s0175.mp3"
+      "filename": "s0174.mp3"
     },
     {
       "index": 89,
       "text": "That's ~6100× fewer retrieval tokens and hundreds-of-thousands fewer tokens per incremental document update.",
       "hash": "545548c740fae776",
-      "filename": "s0177.mp3"
+      "filename": "s0176.mp3"
     },
     {
       "index": 90,
       "text": "The quality is comparable on most dimensions; the cost differential is overwhelming.",
       "hash": "23bf2f94035ac485",
-      "filename": "s0179.mp3"
+      "filename": "s0178.mp3"
     },
     {
       "index": 91,
       "text": "A striking ablation result: removing the original text from retrieval ( variant) didn't hurt performance and sometimes improved it.",
       "hash": "a4eccaa9ae72a641",
-      "filename": "s0181.mp3"
+      "filename": "s0180.mp3"
     },
     {
       "index": 92,
       "text": "The graph index alone carries enough signal.",
       "hash": "e39f0abf228defae",
-      "filename": "s0183.mp3"
+      "filename": "s0182.mp3"
     },
     {
       "index": 93,
       "text": "This implicitly suggests the LLM-extracted KG is denoising the corpus — and is part of why LightRAG can drop community summaries without losing quality.",
       "hash": "eea9efe3844344e0",
-      "filename": "s0185.mp3"
+      "filename": "s0184.mp3"
     },
     {
       "index": 94,
       "text": "LightRAG is best read as the natural answer to \"Microsoft GraphRAG was expensive — what's the minimal version that still works?\".",
       "hash": "88c5cb4669744131",
-      "filename": "s0187.mp3"
+      "filename": "s0186.mp3"
     },
     {
       "index": 95,
       "text": "The contribution is mostly in what you take out:",
       "hash": "03e4d67905a261f9",
-      "filename": "s0189.mp3"
+      "filename": "s0188.mp3"
     },
     {
       "index": 96,
       "text": "Out: hierarchical community detection, community summaries at every level, map-reduce over communities, full reindex on update",
       "hash": "94ef146274bc1614",
-      "filename": "s0191.mp3"
+      "filename": "s0190.mp3"
     },
     {
       "index": 97,
       "text": "In: KV-paired graph index, dual-level (specific/abstract) keyword retrieval in a single pass, set-union for incremental updates",
       "hash": "e2fadff178e2fc10",
-      "filename": "s0193.mp3"
+      "filename": "s0192.mp3"
     },
     {
       "index": 98,
       "text": "The headline numbers — 6100× fewer retrieval tokens, single-API-call queries, free incremental updates, win-rates on par or better than GraphRAG on most dimensions — are what made this paper one of the most-cited GraphRAG variants of 2024.",
       "hash": "5c78d94c5102332e",
-      "filename": "s0195.mp3"
+      "filename": "s0194.mp3"
     },
     {
       "index": 99,
       "text": "Where it's honest about trade-offs: comprehensiveness is roughly tied with GraphRAG (51-54% wins), not dominant.",
       "hash": "1fb801edada40932",
-      "filename": "s0197.mp3"
+      "filename": "s0196.mp3"
     },
     {
       "index": 100,
       "text": "Community summaries do carry information — you give up the ability to browse a corpus the way you can with GraphRAG's C0-level summaries.",
       "hash": "5cde2f6739d2234c",
-      "filename": "s0199.mp3"
+      "filename": "s0198.mp3"
     },
     {
       "index": 101,
       "text": "If you want a \"structured corpus overview product surface\", LightRAG doesn't give you that.",
       "hash": "ee868b7dd27e2d08",
-      "filename": "s0201.mp3"
+      "filename": "s0200.mp3"
     },
     {
       "index": 102,
       "text": "If you want a fast, cheap, dynamic-data-friendly retrieval system, it's the move.",
       "hash": "5cd074cbdb037fc2",
-      "filename": "s0203.mp3"
+      "filename": "s0202.mp3"
     },
     {
       "index": 103,
       "text": "The deeper signal in this paper is methodological: it validates a hypothesis the field had been circling around — the value of GraphRAG comes from the graph structure itself, not from the layered LLM-summarization on top of it.",
       "hash": "db939130c08e2ec3",
-      "filename": "s0205.mp3"
+      "filename": "s0204.mp3"
     },
     {
       "index": 104,
       "text": "Once you accept that, the natural next move is exactly what LightRAG does — keep the graph, drop the summarization, save 99%+ of the cost.",
       "hash": "b8d0b7cd9d2d311e",
-      "filename": "s0207.mp3"
+      "filename": "s0206.mp3"
     },
     {
       "index": 105,
       "text": "Open source at github.com/HKUDS/LightRAG; read alongside Microsoft GraphRAG to see the framing-vs-engineering split clearly.",
       "hash": "cec3740fe9b825de",
-      "filename": "s0209.mp3"
+      "filename": "s0208.mp3"
     }
   ]
 }

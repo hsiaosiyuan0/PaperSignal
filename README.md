@@ -1,175 +1,175 @@
 # PaperSignal
 
-CLI for an LLM to **discover, download, analyze, and publish** arXiv papers as
-self-contained bilingual research briefs — readable in the browser, narrated
-by Edge TTS, deployable to GitHub Pages.
+**中文** · [English](README.en.md)
 
-The Python package and CLI command are both named `paperread`; the project
-itself is **PaperSignal**, and the published site lives at
-[hsiaosiyuan0.github.io/PaperSignal](https://hsiaosiyuan0.github.io/PaperSignal/).
+一个面向 LLM 的命令行工具：让模型**发现、下载、分析、发布** arXiv 论文，生成
+自包含的双语研究简报 —— 浏览器里可读，Edge TTS 朗读，可直接部署到 GitHub Pages。
 
----
-
-## What it does
-
-Given a topic and a target organization, an LLM can:
-
-1. **Find** recent papers by that org (`paperread discover` → OpenAlex)
-2. **Download** the PDF (`paperread download` → arXiv, streaming + retries)
-3. **Convert** to Markdown with LaTeX preserved (`paperread convert` → marker / markitdown)
-4. **Read** the markdown, **write** an analysis (`report.en.md` + `report.zh.md`)
-5. **Build** the published page (`paperread report build` → HTML + per-sentence mp3s)
-6. **Refresh** the archive index (`paperread report index`)
-
-Push to GitHub; Actions deploys to Pages.
+Python 包名与 CLI 命令均为 `paperread`，项目名是 **PaperSignal**，
+发布站点位于 [hsiaosiyuan0.github.io/PaperSignal](https://hsiaosiyuan0.github.io/PaperSignal/)。
 
 ---
 
-## Install
+## 它能做什么
+
+给定一个主题和目标机构，LLM 可以：
+
+1. **检索** 该机构最近的论文（`paperread discover` → OpenAlex）
+2. **下载** PDF（`paperread download` → arXiv，流式下载 + 重试）
+3. **转换** 为 Markdown，保留 LaTeX（`paperread convert` → marker / markitdown）
+4. **阅读** Markdown 后**撰写**分析（`report.en.md` + `report.zh.md`）
+5. **构建** 发布页面（`paperread report build` → HTML + 句级 mp3）
+6. **刷新** 归档索引（`paperread report index`）
+
+推到 GitHub，Actions 自动部署到 Pages。
+
+---
+
+## 安装
 
 ```bash
 git clone git@github.com:hsiaosiyuan0/PaperSignal.git
 cd PaperSignal
-uv sync              # installs deps + creates .venv (first run pulls torch + marker, ~5GB)
-cp .env.example .env # then put your OpenAlex key in .env
+uv sync              # 安装依赖并创建 .venv（首次会拉 torch + marker，约 5GB）
+cp .env.example .env # 然后把 OpenAlex key 填进 .env
 ```
 
-Requires Python 3.12+, [uv](https://github.com/astral-sh/uv), and (optionally)
-a free [OpenAlex API key](https://openalex.org/) for sustained `discover` usage.
+需要 Python 3.12+、[uv](https://github.com/astral-sh/uv)，以及（可选）
+[OpenAlex 免费 API key](https://openalex.org/) —— 长期使用 `discover` 时需要。
 
 ---
 
-## Quick start (the full LLM workflow)
+## 快速开始（完整的 LLM 工作流）
 
 ```bash
-# 1. Find recent Microsoft papers on knowledge retrieval
+# 1. 找微软最近关于知识检索的论文
 uv run paperread discover "knowledge retrieval" \
   --affiliation Microsoft --year 2025- --top 10
 
-# 2. Pick one (say 2604.15597) and prep it
+# 2. 选一篇（比如 2604.15597），准备好资料
 uv run paperread convert 2604.15597
 DIR=$(uv run paperread report path 2604.15597)
 
-# 3. Have the LLM write the analysis. It should read:
+# 3. 让 LLM 写分析。它应当读：
 uv run paperread cache show 2604.15597 --json
-# then Write to:
+# 然后把分析写入：
 #   $DIR/report.en.md
 #   $DIR/report.zh.md
 
-# 4. Build (segments sentences, runs Edge TTS, renders index.html)
+# 4. 构建（切句、跑 Edge TTS、渲染 index.html）
 uv run paperread report build 2604.15597
 
-# 5. Refresh the archive landing page + view locally
+# 5. 刷新归档首页 + 本地查看
 uv run paperread report index
 uv run paperread report open 2604.15597
 ```
 
-A sample LLM analysis ships under [`reports/1706.03762v7/`](reports/1706.03762v7/) —
-"Attention Is All You Need".
+[`reports/1706.03762v7/`](reports/1706.03762v7/) 下有一份 LLM 分析样本 ——
+《Attention Is All You Need》。
 
 ---
 
-## Commands
+## 命令一览
 
-| Command | Purpose |
+| 命令 | 用途 |
 |---|---|
-| `paperread discover QUERY` | Server-side affiliation + year + sort search via OpenAlex |
-| `paperread search QUERY` | arXiv native search (no affiliation filter) |
-| `paperread info ID [--json]` | Metadata for one paper |
-| `paperread download ID` | Streaming PDF fetch, retries on truncation |
+| `paperread discover QUERY` | 通过 OpenAlex 按机构 + 年份 + 排序检索 |
+| `paperread search QUERY` | arXiv 原生搜索（不支持机构过滤） |
+| `paperread info ID [--json]` | 单篇论文元数据 |
+| `paperread download ID` | 流式下载 PDF，截断时自动重试 |
 | `paperread convert ID [-b marker|markitdown]` | PDF → Markdown |
-| `paperread cache list/search/show [--json]` | Query local SQLite, LLM-friendly |
-| `paperread report path ID [--lang en|zh]` | Where to write the analysis MD |
-| `paperread report build ID [--no-audio]` | Render HTML + generate audio |
-| `paperread report open ID` | Open in browser |
-| `paperread report index` | Rebuild `reports/index.html` |
-| `paperread report pages-init` | Scaffold `.nojekyll` + Actions workflow |
+| `paperread cache list/search/show [--json]` | 查询本地 SQLite 缓存，LLM 友好 |
+| `paperread report path ID [--lang en|zh]` | 分析 MD 应写入的目录 |
+| `paperread report build ID [--no-audio]` | 渲染 HTML + 生成音频 |
+| `paperread report open ID` | 浏览器打开 |
+| `paperread report index` | 重建 `reports/index.html` |
+| `paperread report pages-init` | 生成 `.nojekyll` + Actions workflow |
 
-All search / list / show / discover commands accept `--json` for machine consumption.
+所有 search / list / show / discover 命令都支持 `--json`，便于机器消费。
 
 ---
 
-## Configuration
+## 配置
 
-Set in `.env` (gitignored) or your shell:
+在 `.env`（已 gitignore）或 shell 中设置：
 
-| Variable | Purpose |
+| 变量 | 用途 |
 |---|---|
-| `OPENALEX_API_KEY` | Required for `discover` after free trial quota |
-| `PAPERREAD_REPORTS_DIR` | Root of report bundles (default `./reports`) |
-| `PAPERREAD_DATA_DIR` | Where PDFs land (default `./papers`) |
-| `PAPERREAD_CACHE_DIR` | SQLite cache location (default platform cache dir) |
-| `PAPERREAD_TTS_VOICE` | Edge TTS voice (default `en-US-AvaMultilingualNeural`) |
-| `TORCH_DEVICE` | Override marker's auto device pick (`mps` / `cuda` / `cpu`) |
+| `OPENALEX_API_KEY` | `discover` 超出免费额度后必需 |
+| `PAPERREAD_REPORTS_DIR` | 报告目录根（默认 `./reports`） |
+| `PAPERREAD_DATA_DIR` | PDF 存放目录（默认 `./papers`） |
+| `PAPERREAD_CACHE_DIR` | SQLite 缓存路径（默认平台缓存目录） |
+| `PAPERREAD_TTS_VOICE` | Edge TTS 音色（默认 `en-US-AvaMultilingualNeural`） |
+| `TORCH_DEVICE` | 覆盖 marker 自动选择的设备（`mps` / `cuda` / `cpu`） |
 
 ---
 
-## GitHub Pages deployment
+## 部署到 GitHub Pages
 
 ```bash
 uv run paperread report pages-init
 git add -A && git commit -m "scaffold pages" && git push
 ```
 
-Then in repo Settings → Pages → **Source: GitHub Actions**. The workflow
-republishes whenever anything under `reports/` changes.
+然后在仓库 Settings → Pages → **Source: GitHub Actions**。每次 `reports/`
+目录有改动，workflow 都会重新发布。
 
-The published directory structure is self-contained per paper:
+发布的目录结构按论文自包含：
 
 ```
 reports/
-  index.html                       ← archive landing page
-  .nojekyll                        ← keep "_"-prefixed paths
+  index.html                       ← 归档首页
+  .nojekyll                        ← 保留 "_" 开头的路径
   <arxiv_id>/
-    index.html                     ← rendered report
-    report.en.md                   ← LLM source
-    report.zh.md                   ← LLM source (optional)
-    audio/sNNNN.mp3                ← per-sentence Edge TTS
+    index.html                     ← 渲染好的报告
+    report.en.md                   ← LLM 写的英文源
+    report.zh.md                   ← LLM 写的中文源（可选）
+    audio/sNNNN.mp3                ← 句级 Edge TTS
 ```
 
 ---
 
-## Architecture
+## 架构
 
 ```
 src/paperread/
-  arxiv_client.py     wraps the arxiv Python lib; custom UA to dodge rate limits;
-                      streaming PDF download with retry (avoids urlretrieve truncation)
-  openalex.py         /paper/search endpoint, raw_affiliation_strings filter
-  cache.py            SQLite metadata cache with auto-migrated schema (v3)
-  converter.py        marker / markitdown backend abstraction with lazy loading
-  sentences.py        pysbd English boundary detection, filters trivial fragments
-  tts.py              edge-tts async wrapper with manifest-based incremental regen
-  report.py           bilingual HTML renderer; segments rendered HTML plain text
-                      so sentences crossing <strong>/inline math wrap correctly
-  cli.py              Typer commands + JSON contract for LLM consumption
-  paths.py            platformdirs + env overrides
+  arxiv_client.py     封装 arxiv Python 库；自定义 UA 规避限流；
+                      流式 PDF 下载 + 重试（避免 urlretrieve 截断）
+  openalex.py         /paper/search 端点，按 raw_affiliation_strings 过滤
+  cache.py            SQLite 元数据缓存，自动迁移 schema（v3）
+  converter.py        marker / markitdown 后端抽象，懒加载
+  sentences.py        pysbd 英文断句，过滤碎片
+  tts.py              edge-tts 异步封装，基于 manifest 增量重生成
+  report.py           双语 HTML 渲染；按渲染后 HTML 的纯文本切句
+                      使得跨 <strong>/行内公式的句子也能正确高亮
+  cli.py              Typer 命令 + 给 LLM 消费的 JSON 契约
+  paths.py            platformdirs + 环境变量覆盖
 ```
 
 ---
 
-## Design choices worth knowing
+## 值得知道的设计选择
 
-- **Custom User-Agent on arxiv requests** — `arxiv.py/2.3.2` is aggressively
-  rate-limited by arxiv.org; we override the hardcoded UA in the session.
-- **OpenAlex over Semantic Scholar** — S2 requires academic/corporate email
-  for an API key and its affiliation coverage is sparse (~12% in our test).
-  OpenAlex indexes affiliations as a first-class filter with any email signup.
-- **`/paper/search` not `/paper/search/bulk`** — bulk doesn't return
-  `authors.affiliations`; the relevance endpoint does. We sort client-side.
-- **marker over markitdown for default conversion** — preserves LaTeX, which
-  matters for ML/CS papers. markitdown stays available as a faster fallback.
-- **Sentence segmentation on rendered HTML plain text** — not the source MD.
-  This way sentences crossing `<strong>` / `$math$` get multiple `<span>`
-  fragments sharing `data-sentence-id`, all highlighting together on hover.
-- **Edge TTS, not OpenAI / Eleven Labs** — free, no API key, decent voices.
-- **Editor's Desk visual style** — Fraunces variable serif throughout,
-  bone background, single oxidized vermillion accent, Roman-numeral section
-  headers. Deliberately *not* the Inter + purple-gradient AI aesthetic.
+- **arxiv 请求加自定义 User-Agent** —— `arxiv.py/2.3.2` 被 arxiv.org
+  严格限流，我们在 session 中覆盖了它写死的 UA。
+- **选 OpenAlex 而非 Semantic Scholar** —— S2 申请 API key 需要学术/企业
+  邮箱，机构覆盖率也稀疏（我们测试约 12%）。OpenAlex 把机构作为一等公民
+  字段，任意邮箱注册即可用。
+- **用 `/paper/search` 而非 `/paper/search/bulk`** —— bulk 不返回
+  `authors.affiliations`；relevance 端点会返回。我们在客户端再排序。
+- **默认用 marker 而非 markitdown 转换** —— 它保留 LaTeX，对 ML/CS 论文
+  关键。markitdown 作为更快的回退保留。
+- **在渲染后 HTML 的纯文本上切句** —— 不在源 MD 上。这样跨 `<strong>` /
+  `$math$` 的句子会变成多个共享 `data-sentence-id` 的 `<span>` 片段，
+  hover 时整句一起高亮。
+- **选 Edge TTS，不用 OpenAI / Eleven Labs** —— 免费，无需 API key，音质够用。
+- **"Editor's Desk" 视觉风格** —— 全局 Fraunces 可变衬线，骨白底色，
+  单一氧化朱砂强调色，罗马数字章节序号。刻意不走 Inter + 紫色渐变那种
+  AI 美学。
 
 ---
 
-## Tech stack credits
+## 技术栈致谢
 
 [arxiv.py](https://github.com/lukasschwab/arxiv.py) ·
 [OpenAlex](https://openalex.org/) ·
@@ -187,11 +187,10 @@ src/paperread/
 
 ---
 
-## License
+## 许可证
 
-MIT (see `LICENSE` — TBD).
+MIT（参见 `LICENSE` —— TBD）。
 
-> **Note on marker**: the `marker-pdf` dependency is GPL-3.0 for code and uses
-> a modified Open Rail-M license for its models — free for research, personal,
-> and startups under $2M revenue. Commercial self-hosting beyond that threshold
-> requires a license from Datalab.
+> **关于 marker**：依赖中的 `marker-pdf` 代码采用 GPL-3.0，模型用改版
+> Open Rail-M license —— 免费用于科研、个人，以及营收 200 万美元以下的
+> 创业公司。超过该阈值的商业自建部署需要从 Datalab 获得授权。
